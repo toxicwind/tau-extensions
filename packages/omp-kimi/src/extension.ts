@@ -73,10 +73,13 @@ function isExecutable(path: string): boolean {
 }
 
 async function readStream(
-	stream: ReadableStream<Uint8Array> | null,
+	stream: ReadableStream<Uint8Array> | number | null | undefined,
 ): Promise<string> {
-	if (!stream) return "";
-	return new Response(stream).text();
+	// Bun types stdio as `number | ReadableStream | undefined` (fd or pipe).
+	if (stream instanceof ReadableStream) {
+		return new Response(stream as ReadableStream<Uint8Array>).text();
+	}
+	return "";
 }
 
 interface RunOpts {
@@ -438,10 +441,15 @@ export default function kimiExtension(pi: ExtensionAPI): void {
 			// Read the startup banner for the URL + bearer token (up to ~15s).
 			const deadline = Date.now() + 15_000;
 			let banner = "";
-			const reader = (proc.stdout ?? proc.stderr) as ReadableStream<Uint8Array> | null;
+			const bannerSource =
+				proc.stdout instanceof ReadableStream
+					? (proc.stdout as ReadableStream<Uint8Array>)
+					: proc.stderr instanceof ReadableStream
+						? (proc.stderr as ReadableStream<Uint8Array>)
+						: null;
 			try {
-				if (reader) {
-					const r = reader.getReader();
+				if (bannerSource) {
+					const r = bannerSource.getReader();
 					while (Date.now() < deadline) {
 						const { done, value } = await r.read();
 						if (done) break;
