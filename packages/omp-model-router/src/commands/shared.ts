@@ -31,7 +31,7 @@ export const resolveConfigValue = (
 	// Profile dot-path: <profile>.<tier>.model|thinking|fallbacks
 	const profileMatch = key.match(/^([^.]+)\.(high|medium|low)\.(model|thinking|fallbacks)$/);
 	if (profileMatch) {
-		const [, profile, tier, field] = profileMatch;
+		const [, profile, tier, field] = profileMatch as [unknown, string, string, string];
 		const profiles = raw.profiles as Record<string, Record<string, Record<string, unknown>>> | undefined;
 		return profiles?.[profile]?.[tier]?.[field];
 	}
@@ -54,7 +54,7 @@ export const applyConfigUpdate = (
 	// Profile dot-path: <profile>.<tier>.model|thinking|fallbacks
 	const profileMatch = key.match(/^([^.]+)\.(high|medium|low)\.(model|thinking|fallbacks)$/);
 	if (profileMatch) {
-		const [, profile, tier, field] = profileMatch;
+		const [, profile, tier, field] = profileMatch as [unknown, string, string, string];
 		const profiles = raw.profiles as Record<string, Record<string, Record<string, unknown>>> | undefined;
 		if (!profiles?.[profile]) return `Unknown profile: "${profile}"`;
 		if (!profiles[profile][tier]) return `Unknown tier: "${tier}"`;

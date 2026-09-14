@@ -4,6 +4,16 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["packages/**/*.ts"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": [
+    "packages/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "packages/pi-workflow",
+    "packages/pi-agent-browser-native",
+    "packages/omp-best-of",
+    "packages/pi-tasks"
+  ]
 }

@@ -57,21 +57,21 @@ export const handlePin = (
 	let pinValue = "";
 
 	if (args.length === 1) {
-		pinValue = args[0];
+		pinValue = args[0]!;
 	} else {
 		// Legacy two-arg form: /router pin <profile> <tier>
 		// Silently treat second arg as the pin value if it looks like a tier/auto.
-		const maybeProfile = args[0];
-		const maybeTier = args[1];
-		if (PIN_SET.includes(maybeTier)) {
+		const maybeProfile = args[0]!;
+		const maybeTier = args[1]!;
+		if (PIN_SET.includes(maybeTier!)) {
 			// Warn about the profile arg being ignored
 			ctx.ui.notify(
 				`Note: session-scoped pins are profile-independent. Profile arg "${maybeProfile}" ignored.`,
 				"info",
 			);
-			pinValue = maybeTier;
-		} else if (PIN_SET.includes(maybeProfile)) {
-			pinValue = maybeProfile;
+			pinValue = maybeTier!;
+		} else if (PIN_SET.includes(maybeProfile!)) {
+			pinValue = maybeProfile!;
 		} else {
 			ctx.ui.notify(
 				`Invalid arguments. Usage: /router pin <high|medium|low|auto>`,

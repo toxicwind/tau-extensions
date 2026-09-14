@@ -353,7 +353,7 @@ const routerExtension = (pi: ExtensionAPI) => {
 			const branch = ctx.sessionManager.getBranch();
 			// Walk from the end; find the most recent user-role message entry
 			for (let i = branch.length - 1; i >= 0; i--) {
-				const e = branch[i];
+				const e = branch[i]!;
 				if (e.type === "message" && (e as any).message?.role === "user") {
 					if (e.id !== state.scope.lastUserEntryId) {
 						state.scope.userMessagesSeen += 1;
@@ -466,7 +466,7 @@ const routerExtension = (pi: ExtensionAPI) => {
 			const currentTier = state.lastDecision?.tier ?? "low";
 			const currentIdx = ROUTER_TIERS.indexOf(currentTier);
 			if (currentIdx > 0) {
-				const upgradedTier = ROUTER_TIERS[currentIdx - 1]; // higher = lower index
+				const upgradedTier = ROUTER_TIERS[currentIdx - 1]!; // higher = lower index
 				setScopedPin(state.scope, upgradedTier, "auto-upgrade", state.currentConfig);
 				state.toolFailureStreak.delete(event.toolName);
 				if (state.debugEnabled) {

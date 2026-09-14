@@ -1,4 +1,4 @@
-import type { RouterTier } from "../types";
+import type { RouterTier, RouterPhase } from "../types";
 
 /**
  * Session-scoped calibration state
@@ -23,6 +23,9 @@ export interface SessionCalibration {
 
 	/** Count of user turns (not assistant) */
 	turnsProcessed: number;
+
+	/** Path to classifier prompt JSONL log (if prompt logging is enabled) */
+	promptLogPath?: string;
 
 	/** Path to trace JSONL file (if traceEnabled) */
 	traceFilePath?: string;

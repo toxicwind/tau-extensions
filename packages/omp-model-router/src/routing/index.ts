@@ -78,7 +78,7 @@ export const runClassifier = async (
 
 	// Try each classifier in sequence until one succeeds
 	for (let i = 0; i < classifierModelRefs.length; i++) {
-		const classifierModelRef = classifierModelRefs[i];
+		const classifierModelRef = classifierModelRefs[i]!;
 
 		if (debug && classifierModelRefs.length > 1) {
 			console.log(

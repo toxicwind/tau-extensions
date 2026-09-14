@@ -59,7 +59,7 @@ const savePersistentState = (state: RouterPersistedState): void => {
  * Returns `undefined` when sessions are disabled (no session file).
  */
 const debugFilePath = (state: RouterState): string | undefined => {
-	const sessionFile = state.lastExtensionContext?.sessionManager.sessionFile;
+	const sessionFile = state.lastExtensionContext?.sessionManager.getSessionFile();
 	if (!sessionFile) return undefined;
 	// Replace trailing .jsonl with .debug.jsonl; handles any extension gracefully.
 	return sessionFile.endsWith(".jsonl")

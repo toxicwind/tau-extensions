@@ -67,7 +67,7 @@ export class FallbackPickerComponent implements Component {
 		
 		// Initialize TabBar with provider scopes derived from available models
 		const selectListTheme = buildSelectListTheme(this.#theme);
-		const providers = [...new Set(allModels.map((m) => m.value.split("/")[0]))].sort();
+		const providers = [...new Set(allModels.map((m) => m.value.split("/")[0]!))].sort();
 		const tabs: Tab[] = [{ id: "all", label: "ALL" }];
 		for (const p of providers) {
 			tabs.push({ id: p, label: p.toUpperCase() });
@@ -173,7 +173,7 @@ export class FallbackPickerComponent implements Component {
 			const selectedTab = this.#tabBar.getActiveIndex();
 			const scopes = ["all", "amazon-bedrock", "anthropic", "openai", "google"];
 			if (selectedTab >= 0 && selectedTab < scopes.length) {
-				this.#scope = scopes[selectedTab];
+				this.#scope = scopes[selectedTab]!;
 				this.#applyFilters();
 			}
 			return;
@@ -210,7 +210,7 @@ export class FallbackPickerComponent implements Component {
 		// 6. Toggle current selection
 		if (data === " ") {
 			if (this.#filteredModels.length > 0 && this.#selectedIndex >= 0) {
-				const highlighted = this.#filteredModels[this.#selectedIndex];
+				const highlighted = this.#filteredModels[this.#selectedIndex]!;
 				this.#toggle(highlighted.value);
 			}
 			return;
