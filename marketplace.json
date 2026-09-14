@@ -93,6 +93,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-workflow",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "pi-agent-browser-native",
+      "description": "Expose agent-browser as a native Tau tool: scripted browser automation (navigate, snapshot, act, extract) with session management, batch lifecycle, and hardened command policies.",
+      "version": "0.6.12",
+      "source": "./pi-agent-browser-native",
+      "category": "automation",
+      "keywords": [
+        "browser",
+        "automation",
+        "agent-browser",
+        "web",
+        "scraping"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-agent-browser-native",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }
