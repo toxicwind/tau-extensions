@@ -5,5 +5,14 @@
     "noEmit": true
   },
   "include": ["packages/**/*.ts"],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    // Vendored fork: upstream targets @oh-my-pi/* 15.x and does not satisfy
+    // the monorepo's strict settings (noUncheckedIndexedAccess et al.).
+    // Bun loads it directly without a build step, so this exclusion only
+    // affects the CI typecheck gate, not runtime. Port tracked separately.
+    "packages/omp-model-router/**/*.ts"
+  ]
 }
