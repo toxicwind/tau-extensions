@@ -144,6 +144,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/gsd-omp",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "omp-undo-redo",
+      "description": "Session and file undo/redo for Tau: snapshot-based undo of agent edits and session operations, with redo support.",
+      "version": "1.6.2",
+      "source": "./omp-undo-redo",
+      "category": "workflow",
+      "keywords": [
+        "undo",
+        "redo",
+        "history",
+        "edits",
+        "session"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-undo-redo",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }

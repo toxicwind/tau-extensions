@@ -27,3 +27,6 @@ Our own extensions are © toxicwind (MIT) unless noted in the package.
 
 - packages/gsd-omp
   Derived from tchivs/gsd-omp (MIT), version 1.0.24. Ships as CommonJS; loader entry is ./src/extension.cjs.
+
+- packages/omp-undo-redo
+  Derived from Baylar55/omp-undo-redo (MIT), version 1.6.2.
