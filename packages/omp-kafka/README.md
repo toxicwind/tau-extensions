@@ -1,6 +1,6 @@
 # omp-kafka
 
-Part of [`toxicwind/omp-extensions`](https://github.com/toxicwind/omp-extensions) — a monorepo of oh-my-pi (`omp`) extensions.
+Part of [`toxicwind/tau-extensions`](https://github.com/toxicwind/tau-extensions) — a monorepo of oh-my-pi (`omp`) extensions.
 
 An [oh-my-pi (`omp`)](https://github.com/can1357/oh-my-pi) extension that lets an `omp` (or `pi`) instance subscribe to Apache Kafka topics and surface the messages in two ways:
 
@@ -24,7 +24,7 @@ Requires `omp >= 17.0.0`.
 ### Option A — clone the monorepo and link
 
 ```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/omp-extensions ~/.tau/agent/extensions/omp-extensions
+git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/tau-extensions ~/.tau/agent/extensions/omp-extensions
 cd ~/.tau/agent/extensions/omp-extensions
 git sparse-checkout set packages/omp-kafka
 cd packages/omp-kafka

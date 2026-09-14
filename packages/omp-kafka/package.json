@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/toxicwind/omp-extensions.git",
+    "url": "git+https://github.com/toxicwind/tau-extensions.git",
     "directory": "packages/omp-kafka"
   },
-  "homepage": "https://github.com/toxicwind/omp-extensions/tree/main/packages/omp-kafka#readme",
+  "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kafka#readme",
   "bugs": {
-    "url": "https://github.com/toxicwind/omp-extensions/issues"
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
   },
   "files": [
     "src",

@@ -2,12 +2,13 @@
   "type": "module",
   "name": "@cakriwut/omp-model-router",
   "version": "0.8.9",
-  "description": "Cost-optimized model routing for Oh-My-Pi — routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs. Uses TOON compression for conversation history optimization.",
+  "description": "Cost-optimized model routing for Oh-My-Pi \u2014 routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs. Uses TOON compression for conversation history optimization.",
   "author": "Riwut Libinuko <cakriwut@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cakriwut/omp-model-router.git"
+    "url": "git+https://github.com/toxicwind/tau-extensions.git",
+    "directory": "packages/omp-model-router"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -43,9 +44,9 @@
     "toon-compression"
   ],
   "bugs": {
-    "url": "https://github.com/cakriwut/omp-model-router/issues"
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
   },
-  "homepage": "https://github.com/cakriwut/omp-model-router#readme",
+  "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-model-router#readme",
   "peerDependencies": {
     "@oh-my-pi/pi-coding-agent": "^15.11.0",
     "@oh-my-pi/pi-agent-core": "^15.11.0",

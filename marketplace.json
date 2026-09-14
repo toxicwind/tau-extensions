@@ -1,5 +1,5 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "tau-extensions",
   "owner": {
     "name": "toxicwind",
@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Tau extensions by toxicwind",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "pluginRoot": "packages"
   },
   "plugins": [
     {
       "name": "omp-kafka",
-      "description": "Consume Kafka topics into an omp session in auto (push) or pull mode. Requires omp install (factory module).",
-      "version": "0.1.0",
+      "description": "Consume Kafka topics into a Tau/omp session in auto (push) or pull mode.",
+      "version": "0.2.0",
       "source": "./omp-kafka",
       "category": "integration",
       "keywords": [
@@ -24,12 +24,13 @@
         "extension"
       ],
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kafka",
+      "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
     },
     {
       "name": "omp-edit-committer",
-      "description": "Auto-commit every Edit/Write with a descriptive message and surface the SHA in the TUI for use with modem-dev/hunk. Requires omp install (factory module).",
-      "version": "0.1.0",
+      "description": "Auto-commit every Edit/Write with a descriptive message and surface the SHA in the TUI.",
+      "version": "0.2.0",
       "source": "./omp-edit-committer",
       "category": "workflow",
       "keywords": [
@@ -40,6 +41,23 @@
         "extension"
       ],
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-edit-committer",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-model-router",
+      "description": "Cost-optimized model routing for Tau/omp \u2014 routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs.",
+      "version": "0.8.9",
+      "source": "./omp-model-router",
+      "category": "model-routing",
+      "keywords": [
+        "model-router",
+        "cost-optimization",
+        "routing",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-model-router",
+      "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
     }
   ]

@@ -76,7 +76,7 @@ Then in OMP:
 
 ### Config File
 
-Create or edit `~/.omp/agent/model-router.json`:
+Create or edit `~/.tau/agent/model-router.json`:
 
 ```json
 {
@@ -218,7 +218,7 @@ When a classifier model is active, the router looks for a pitfalls file in this 
 
 1. `pitfallsPath` config field (explicit override)
 2. `model-router-pitfalls.md` in the current project directory
-3. `~/.omp/agent/model-router/pitfalls.md` (global, applies everywhere)
+3. `~/.tau/agent/model-router/pitfalls.md` (global, applies everywhere)
 
 The file contents are injected between the tier definitions and the conversation history in the classifier prompt, so the LLM sees ground truth before evaluating.
 
@@ -240,7 +240,7 @@ Requires hypothesis generation and broad search — high cognitive load even for
 Correct: **high**. Common misclass: medium (eventual fix may be a one-liner).
 ```
 
-A starter file with 10 common pitfalls is installed at `~/.omp/agent/model-router/pitfalls.md` automatically. See `pitfalls.example.md` in this repo for the full template.
+A starter file with 10 common pitfalls is installed at `~/.tau/agent/model-router/pitfalls.md` automatically. See `pitfalls.example.md` in this repo for the full template.
 
 ### Project-Local Pitfalls
 
@@ -277,7 +277,7 @@ To hide these messages: set `"debug": false` and run `/reload`.
 bun install
 bun run test                # Run test suite with summary output (recommended)
 bun run test:verbose        # Show all test output with dots reporter
-bun run deploy:dev          # Deploy to ~/.omp/agent/extensions/model-router
+bun run deploy:dev          # Deploy to ~/.tau/agent/extensions/model-router
 ```
 
 **Test output modes:**
@@ -368,7 +368,7 @@ docs/                     # Implementation docs
 
 ### "Router not active"
 1. Check `routerEnabled: true` in config
-2. Verify config file exists: `~/.omp/agent/model-router.json`
+2. Verify config file exists: `~/.tau/agent/model-router.json`
 3. Run `/router` to see current status
 4. Try `/reload` to re-initialize the extension
 

@@ -2,7 +2,7 @@
 
 [`toxicwind/tau-extensions`](https://github.com/toxicwind/tau-extensions) — a monorepo of Tau extensions.
 
-A curated set of Tau extensions that plug directly into your Tau agent session. Two extensions ship out of the box:
+A curated set of Tau extensions that plug directly into your Tau agent session. Three extensions ship out of the box:
 
 - **omp-kafka** — subscribe to Apache Kafka topics and surface messages in the session (auto push or on-demand pull).
 - **omp-edit-committer** — auto-commit every Edit/Write with a descriptive Conventional-Commits message and surface the SHA under the tool result.
@@ -34,7 +34,7 @@ Requires `omp >= 17.0.0`.
 ### Option A — clone the monorepo and link
 
 ```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/omp-extensions ~/.tau/agent/extensions/omp-extensions
+git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/tau-extensions ~/.tau/agent/extensions/omp-extensions
 cd ~/.tau/agent/extensions/omp-extensions
 git sparse-checkout set packages/omp-kafka
 cd packages/omp-kafka
