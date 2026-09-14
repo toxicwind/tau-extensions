@@ -11,9 +11,11 @@
  *   /kimi-models [provider] [--filter <s>]
  *       Configured providers, or the public model catalog for a provider.
  *   /kimi-doctor      Validate kimi's config.toml / tui.toml.
- *   /kimi-web [--port <n>]   Start `kimi web` (web UI + REST/WS API) detached
- *       and report the URL + bearer token. Binds loopback only.
- *   /kimi-web-stop    Stop the web server started by /kimi-web.
+ *   /kimi-web [--port <n>]   Start the integrated tau+kimi web UI: one
+ *       gateway (loopback only) serving kimi's full WebUI plus the tau
+ *       shell with collab-web side by side. Reports the single entry
+ *       URL + token — no parallel `kimi web` instance.
+ *   /kimi-web-stop    Stop the web gateway started by /kimi-web.
  *   kimi_ask (tool)   LLM-callable equivalent of /kimi.
  *
  * Configuration (environment):
@@ -21,6 +23,9 @@
  *                    ~/.kimi-code/bin/kimi).
  *   KIMI_API_KEY     Moonshot platform API key (also used by kimi itself).
  *   KIMI_TIMEOUT_MS  Timeout for `kimi -p` runs (default 120000).
+ *   KIMI_WEB_PORT    Preferred gateway port for /kimi-web (default 58627).
+ *   TAU_COLLAB_WEB_URL  URL of a collab-web client to embed in the tau
+ *                    shell's Collab tab (optional).
  *   KIMI_DISABLED=1  Skip the extension entirely.
  *
  * The extension loads (with a warning) even when kimi is not installed;
@@ -30,12 +35,10 @@
 import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
 import { z } from "zod/v4";
 import {
-	DEFAULT_WEB_PORT,
 	INSTALL_HINT,
 	STATUS_KEY,
 	binaryCandidates,
 	buildPromptArgs,
-	buildWebArgs,
 	parseKimiArgs,
 	parseVersion,
 	pickBinary,
@@ -45,6 +48,7 @@ import {
 	type EnvLike,
 	type KimiRunResult,
 } from "./kimi.ts";
+import { KimiWebGateway, type GatewayInfo } from "./web.ts";
 
 const DEBUG = (process.env as EnvLike).KIMI_DEBUG === "1";
 const DISABLED = (process.env as EnvLike).KIMI_DISABLED === "1";
@@ -59,8 +63,8 @@ function debug(...args: unknown[]): void {
 interface KimiState {
 	binary: string | null;
 	version: string | null;
-	webProc: ReturnType<typeof Bun.spawn> | null;
-	webUrl: string | null;
+	gateway: KimiWebGateway | null;
+	gatewayInfo: GatewayInfo | null;
 }
 
 function isExecutable(path: string): boolean {
@@ -200,8 +204,8 @@ export default function kimiExtension(pi: ExtensionAPI): void {
 	const state: KimiState = {
 		binary: null,
 		version: null,
-		webProc: null,
-		webUrl: null,
+		gateway: null,
+		gatewayInfo: null,
 	};
 
 	const refreshStatus = (ctx: ExtensionContext): void => {
@@ -254,14 +258,14 @@ export default function kimiExtension(pi: ExtensionAPI): void {
 	});
 
 	pi.on("session_shutdown", async () => {
-		if (state.webProc) {
+		if (state.gateway) {
 			try {
-				state.webProc.kill("SIGTERM");
+				await state.gateway.stop();
 			} catch {
 				/* already gone */
 			}
-			state.webProc = null;
-			state.webUrl = null;
+			state.gateway = null;
+			state.gatewayInfo = null;
 		}
 	});
 
@@ -314,7 +318,7 @@ export default function kimiExtension(pi: ExtensionAPI): void {
 			);
 			lines.push(`timeout: ${resolveTimeoutMs(env)}ms (KIMI_TIMEOUT_MS)`);
 			lines.push(
-				`web UI: ${state.webUrl ? `running at ${state.webUrl}` : "not running"}`,
+				`web UI: ${state.gatewayInfo ? `integrated gateway at ${state.gatewayInfo.url}` : "not running"} (use /kimi-web)`,
 			);
 			if (!state.binary) lines.push("", INSTALL_HINT);
 			emitResult(pi, "kimi-status", lines.join("\n"), "");
@@ -394,121 +398,92 @@ export default function kimiExtension(pi: ExtensionAPI): void {
 	});
 
 	// ---- /kimi-web ------------------------------------------------------------
+	// Integrated web UI: ONE gateway on loopback serving kimi's full WebUI
+	// plus the tau shell (Kimi + collab-web tabs). This replaces the old
+	// behavior of launching `kimi web` detached as a parallel web UI.
+
+	function resolveGatewayPort(args: string): number | null | undefined {
+		const tokens = tokenizeArgs(args.trim());
+		const portIdx = tokens.indexOf("--port");
+		if (portIdx >= 0) {
+			if (portIdx + 1 >= tokens.length) return null;
+			const port = Number(tokens[portIdx + 1]);
+			if (!Number.isInteger(port) || port < 1 || port > 65535) return null;
+			return port;
+		}
+		const fromEnv = Number((process.env as EnvLike).KIMI_WEB_PORT ?? "");
+		if (Number.isInteger(fromEnv) && fromEnv >= 1 && fromEnv <= 65535) {
+			return fromEnv;
+		}
+		return undefined; // gateway default
+	}
 
 	pi.registerCommand("kimi-web", {
 		description:
-			"Start `kimi web` (web UI + REST/WebSocket API) detached on loopback " +
-			"and report the URL + bearer token. Usage: /kimi-web [--port <n>]",
+			"Start the integrated tau+kimi web UI (one gateway on loopback: " +
+			"kimi's full WebUI plus the tau shell with collab-web). " +
+			"Usage: /kimi-web [--port <n>]",
 		handler: async (args, ctx) => {
 			const binary = requireBinary(state);
-			if (state.webProc) {
+			if (state.gateway) {
 				ctx.ui.notify(
-					`kimi: web UI already running at ${state.webUrl ?? "(unknown URL)"} — /kimi-web-stop first`,
+					`kimi: web gateway already running at ${state.gatewayInfo?.url ?? "(unknown URL)"} — /kimi-web-stop first`,
 					"warning",
 				);
 				return;
 			}
-			const tokens = tokenizeArgs(args.trim());
-			const portIdx = tokens.indexOf("--port");
-			const port =
-				portIdx >= 0 && portIdx + 1 < tokens.length
-					? Number(tokens[portIdx + 1])
-					: DEFAULT_WEB_PORT;
-			if (!Number.isInteger(port) || port < 1 || port > 65535) {
+			const port = resolveGatewayPort(args);
+			if (port === null) {
 				ctx.ui.notify("usage: /kimi-web [--port <1-65535>]", "warning");
 				return;
 			}
-
-			let proc: ReturnType<typeof Bun.spawn>;
+			const gateway = new KimiWebGateway({
+				binary,
+				cwd: ctx.cwd,
+				port: port ?? undefined,
+				onLog: (msg) => debug(msg),
+			});
 			try {
-				proc = Bun.spawn(
-					[binary, ...buildWebArgs({ port, noOpen: true })],
-					{
-						cwd: ctx.cwd,
-						stdout: "pipe",
-						stderr: "pipe",
-						env: { ...process.env } as Record<string, string>,
-					},
-				);
+				const info = await gateway.start();
+				state.gateway = gateway;
+				state.gatewayInfo = info;
 			} catch (err) {
 				ctx.ui.notify(
-					`kimi: failed to launch web server: ${(err as Error).message}`,
+					`kimi: web gateway failed to start: ${(err as Error).message}`,
 					"error",
 				);
 				return;
 			}
-
-			// Read the startup banner for the URL + bearer token (up to ~15s).
-			const deadline = Date.now() + 15_000;
-			let banner = "";
-			const bannerSource =
-				proc.stdout instanceof ReadableStream
-					? (proc.stdout as ReadableStream<Uint8Array>)
-					: proc.stderr instanceof ReadableStream
-						? (proc.stderr as ReadableStream<Uint8Array>)
-						: null;
-			try {
-				if (bannerSource) {
-					const r = bannerSource.getReader();
-					while (Date.now() < deadline) {
-						const { done, value } = await r.read();
-						if (done) break;
-						banner += new TextDecoder().decode(value);
-						if (/https?:\/\/[^\s]+/.test(banner) && /[Bb]earer|token/i.test(banner)) {
-							break;
-						}
-					}
-					r.releaseLock();
-				}
-			} catch (err) {
-				debug("banner read failed:", err);
-			}
-
-			const urlMatch = banner.match(/https?:\/\/[^\s"']+/);
-			if (!urlMatch) {
-				try {
-					proc.kill("SIGTERM");
-				} catch {
-					/* already gone */
-				}
-				ctx.ui.notify(
-					"kimi: web server did not print a URL within 15s — not started.\n" +
-						truncateOutput(banner),
-					"error",
-				);
-				return;
-			}
-
-			state.webProc = proc;
-			state.webUrl = urlMatch[0];
-			// Drain remaining output so the pipe never blocks the server.
-			void readStream(proc.stdout).catch(() => {});
-			void readStream(proc.stderr).catch(() => {});
+			const info = state.gatewayInfo;
 			emitResult(
 				pi,
 				"kimi-web",
-				`kimi web UI running (loopback only):\n\n${truncateOutput(banner)}\n\n` +
-					`Stop it with /kimi-web-stop. The bearer token above is a secret — do not paste it anywhere.`,
+				`tau+kimi web UI running (loopback only):\n\n${info?.url ?? "(unknown URL)"}\n\n` +
+					`One URL, one token: kimi's full WebUI plus the tau shell ` +
+					`(Kimi + collab-web tabs). Stop it with /kimi-web-stop. ` +
+					`The token above is a secret — do not paste it anywhere.`,
 				"",
 			);
+			refreshStatus(ctx);
 		},
 	});
 
 	pi.registerCommand("kimi-web-stop", {
-		description: "Stop the kimi web server started by /kimi-web.",
+		description: "Stop the integrated web gateway started by /kimi-web.",
 		handler: async (_args, ctx) => {
-			if (!state.webProc) {
-				ctx.ui.notify("kimi: no web server running", "info");
+			if (!state.gateway) {
+				ctx.ui.notify("kimi: no web gateway running", "info");
 				return;
 			}
 			try {
-				state.webProc.kill("SIGTERM");
+				await state.gateway.stop();
 			} catch (err) {
-				debug("web stop kill failed:", err);
+				debug("gateway stop failed:", err);
 			}
-			state.webProc = null;
-			state.webUrl = null;
-			ctx.ui.notify("kimi: web server stopped", "info");
+			state.gateway = null;
+			state.gatewayInfo = null;
+			ctx.ui.notify("kimi: web gateway stopped", "info");
+			refreshStatus(ctx);
 		},
 	});
 

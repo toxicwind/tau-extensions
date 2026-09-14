@@ -18,6 +18,7 @@ export interface EnvLike {
 	KIMI_BINARY?: string;
 	KIMI_API_KEY?: string;
 	KIMI_TIMEOUT_MS?: string;
+	KIMI_WEB_PORT?: string;
 	KIMI_DISABLED?: string;
 	KIMI_DEBUG?: string;
 	[key: string]: string | undefined;
