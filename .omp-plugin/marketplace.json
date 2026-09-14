@@ -161,6 +161,16 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-undo-redo",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "engram",
+      "source": "packages/engram/package.json",
+      "description": "Memory extension vendored from the local adapted copy of thebtf/engram. Upstream MIT license, Kirill Turanskiy; local adaptations retained.",
+      "metadata": {
+        "pluginRoot": "packages",
+        "origin": "thebtf/engram",
+        "locallyAdapted": true
+      }
     }
   ]
 }
