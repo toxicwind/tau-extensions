@@ -127,6 +127,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-best-of",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "gsd-omp",
+      "description": "GSD Embeddable Orchestration System host plugin for Tau: binds the native extension, command, event, task, and filesystem surfaces to GSD via the Host-Integration SDK, with optional Goal Mode status mirroring.",
+      "version": "1.0.24",
+      "source": "./gsd-omp",
+      "category": "orchestration",
+      "keywords": [
+        "gsd",
+        "orchestration",
+        "host-plugin",
+        "goal-mode",
+        "sdk"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/gsd-omp",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }

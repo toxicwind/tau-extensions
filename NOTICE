@@ -24,3 +24,6 @@ Our own extensions are © toxicwind (MIT) unless noted in the package.
 
 - packages/omp-best-of
   Derived from wolfiesch/omp-best-of (MIT), version 0.2.0.
+
+- packages/gsd-omp
+  Derived from tchivs/gsd-omp (MIT), version 1.0.24. Ships as CommonJS; loader entry is ./src/extension.cjs.
