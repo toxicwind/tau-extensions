@@ -10,7 +10,6 @@
     "typescript": "^5.6.0"
   },
   "scripts": {
-    "typecheck": "tsc -b",
     "build": "tsc -b",
     "lint": "biome check packages/*/src",
     "test": "bun test packages/*",
