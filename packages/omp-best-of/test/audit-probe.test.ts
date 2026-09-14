@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import * as zod from "@oh-my-pi/omptype/zod";
+import * as zod from "zod";
 import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
 import auditProbeExtension, { assertAuditSandboxSupported } from "../src/audit-probe-extension";
 
