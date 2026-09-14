@@ -130,8 +130,8 @@ function arkJsonAstToWire(node: unknown): JsonSchema {
 	if ("index" in n && Array.isArray(n["index"])) {
 		const indexEntries = n["index"] as Array<{ signature?: unknown; value?: unknown }>;
 		let valueSchema: JsonSchema = {};
-		if (indexEntries.length > 0 && indexEntries[0].value !== undefined) {
-			valueSchema = arkJsonAstToWire(indexEntries[0].value);
+		if (indexEntries.length > 0 && indexEntries[0]!.value !== undefined) {
+			valueSchema = arkJsonAstToWire(indexEntries[0]!.value);
 		}
 		const result: JsonSchema = { type: "object", additionalProperties: valueSchema };
 		if (meta) result["description"] = meta;

@@ -60,7 +60,7 @@ const ORIGINAL_STATUS_RE = /Original error:\s*(\d{3})/;
 export function parseRetryAfterMs(errorMessage: string): number | undefined {
 	const match = errorMessage.match(RETRY_AFTER_MS_RE);
 	if (!match) return undefined;
-	const value = parseInt(match[1], 10);
+	const value = parseInt(match[1]!, 10);
 	return Number.isFinite(value) && value > 0 ? value : undefined;
 }
 
@@ -72,7 +72,7 @@ export function parseRetryAfterMs(errorMessage: string): number | undefined {
 export function parseOriginalStatus(errorMessage: string): number | undefined {
 	const match = errorMessage.match(ORIGINAL_STATUS_RE);
 	if (!match) return undefined;
-	const value = parseInt(match[1], 10);
+	const value = parseInt(match[1]!, 10);
 	return Number.isFinite(value) && value > 0 ? value : undefined;
 }
 

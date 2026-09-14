@@ -15,7 +15,7 @@ export const handleFix = (
 		ctx.ui.notify("Usage: /router fix <high|medium|low>", "error");
 		return;
 	}
-	const tier = args[0]?.toLowerCase();
+	const tier = args[0]!.toLowerCase();
 	if (!TIER_SET.includes(tier)) {
 		ctx.ui.notify("Usage: /router fix <high|medium|low>", "error");
 		return;
