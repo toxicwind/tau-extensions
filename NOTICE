@@ -12,3 +12,6 @@ retained in each package directory.
   Derived from cakriwut/omp-model-router (MIT, © Riwut Libinuko).
 
 Our own extensions are © toxicwind (MIT) unless noted in the package.
+
+- packages/pi-tasks
+  Derived from tintinweb/pi-tasks (MIT, copyright tintinweb), version 0.9.0.

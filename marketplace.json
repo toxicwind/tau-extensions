@@ -59,6 +59,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-model-router",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "pi-tasks",
+      "description": "Claude Code-style task tracking and coordination: structured multi-step tasks, dependency management, background task processes, and a persistent visual task widget.",
+      "version": "0.9.0",
+      "source": "./pi-tasks",
+      "category": "productivity",
+      "keywords": [
+        "tasks",
+        "tracking",
+        "coordination",
+        "background-tasks",
+        "widget"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-tasks",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }
