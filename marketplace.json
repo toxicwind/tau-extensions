@@ -76,6 +76,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-tasks",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "pi-workflow",
+      "description": "Workflow orchestration for Tau: named, repeatable multi-step workflows (research, code review, spec checks) coordinating subagent workers across steps, with run inspection, stop, and resume.",
+      "version": "0.13.8",
+      "source": "./pi-workflow",
+      "category": "workflow",
+      "keywords": [
+        "workflow",
+        "orchestration",
+        "subagents",
+        "automation",
+        "pipeline"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-workflow",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }
