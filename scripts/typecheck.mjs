@@ -6,9 +6,12 @@
 //   packages/pi-workflow             -> its own tsconfig.json (strict NodeNext)
 //   packages/pi-agent-browser-native  -> its own tsconfig.json (upstream)
 //   packages/omp-best-of              -> its own check:types script
-// Every other package (omp-model-router, pi-tasks, gsd-omp, omp-edit-committer,
-// omp-kafka) is checked by the root tsconfig, which excludes the three above so
+//   packages/pi-tasks                 -> its own tsconfig.json (upstream)
+// Every other package (omp-model-router, gsd-omp, omp-edit-committer,
+// omp-kafka) is checked by the root tsconfig, which excludes the four above so
 // nothing is double-checked and nothing is skipped.
+// (pi-tasks was moved to native after its root-config ChildProcess errors
+// proved to be a dual-@types/node resolution artifact; its own tsconfig is green.)
 // Fails fast: the first failing step aborts with its output.
 
 import { execSync } from 'node:child_process';
@@ -17,6 +20,7 @@ const steps = [
   { name: 'pi-workflow', dir: 'packages/pi-workflow', cmd: 'bunx tsc --noEmit' },
   { name: 'pi-agent-browser-native', dir: 'packages/pi-agent-browser-native', cmd: 'bunx tsc -p tsconfig.json --noEmit' },
   { name: 'omp-best-of', dir: 'packages/omp-best-of', cmd: 'bun run check:types' },
+  { name: 'pi-tasks', dir: 'packages/pi-tasks', cmd: 'bunx tsc -p tsconfig.json --noEmit' },
   { name: 'root (remaining packages)', dir: '.', cmd: 'bunx tsc --noEmit -p tsconfig.json' },
 ];
 

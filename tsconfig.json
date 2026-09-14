@@ -13,6 +13,7 @@
     "build",
     "packages/pi-workflow",
     "packages/pi-agent-browser-native",
-    "packages/omp-best-of"
+    "packages/omp-best-of",
+    "packages/pi-tasks"
   ]
 }
