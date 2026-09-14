@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "omp-extensions",
+  "name": "tau-extensions",
   "owner": {
     "name": "toxicwind",
     "email": "toxicwind@users.noreply.github.com"
   },
   "metadata": {
-    "description": "oh-my-pi (omp) extensions by toxicwind",
+    "description": "Tau extensions by toxicwind",
     "version": "0.2.0",
     "pluginRoot": "packages",
     "repository": "https://github.com/toxicwind/omp-extensions"

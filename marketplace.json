@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "omp-extensions",
+  "name": "tau-extensions",
   "owner": {
-    "name": "RekunDzmitry",
-    "email": "dzmitryrekun@users.noreply.github.com"
+    "name": "toxicwind",
+    "email": "toxicwind@users.noreply.github.com"
   },
   "metadata": {
-    "description": "oh-my-pi (omp) extensions by RekunDzmitry",
+    "description": "Tau extensions by toxicwind",
     "version": "0.1.0",
     "pluginRoot": "packages"
   },
@@ -23,7 +23,7 @@
         "events",
         "extension"
       ],
-      "homepage": "https://github.com/RekunDzmitry/omp-extensions/tree/main/packages/omp-kafka",
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kafka",
       "license": "MIT"
     },
     {
@@ -39,7 +39,7 @@
         "review",
         "extension"
       ],
-      "homepage": "https://github.com/RekunDzmitry/omp-extensions/tree/main/packages/omp-edit-committer",
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-edit-committer",
       "license": "MIT"
     }
   ]
