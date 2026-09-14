@@ -1,0 +1,14 @@
+tau-extensions — NOTICE of fork provenance
+
+This monorepo contains extensions originally authored by third parties,
+forked under their respective MIT licenses. Original LICENSE files are
+retained in each package directory.
+
+- packages/omp-kafka, packages/omp-edit-committer
+  Derived from RekunDzmitry/omp-extensions (MIT, © RekunDzmitry),
+  via the toxicwind/omp-extensions fork (now retired).
+
+- packages/omp-model-router
+  Derived from cakriwut/omp-model-router (MIT, © Riwut Libinuko).
+
+Our own extensions are © toxicwind (MIT) unless noted in the package.
