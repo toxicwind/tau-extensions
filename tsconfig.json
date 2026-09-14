@@ -4,6 +4,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["packages/*/src/**/*"],
+  "include": ["packages/**/*.ts"],
   "exclude": ["node_modules", "dist", "build"]
 }
