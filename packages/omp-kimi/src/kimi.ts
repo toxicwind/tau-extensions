@@ -114,7 +114,9 @@ export function tokenizeArgs(input: string): string[] {
 			} else {
 				cur += ch;
 			}
-		} else if (ch === '"' || ch === "'") {
+		} else if ((ch === '"' || ch === "'") && cur === "") {
+			// A quote only opens at a token boundary, so apostrophes inside
+			// words (e.g. "it's") stay literal.
 			quote = ch;
 		} else if (/\s/.test(ch)) {
 			if (cur !== "") {
