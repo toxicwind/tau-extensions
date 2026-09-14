@@ -54,8 +54,8 @@
 export function isArkTypeInstance(schema: unknown): schema is { toJsonSchema(opts?: unknown): Record<string, unknown> } {
 	return (
 		typeof schema === "function" &&
-		typeof (schema as Record<string, unknown>)["toJsonSchema"] === "function" &&
-		typeof (schema as Record<string, unknown>)["assert"] === "function"
+		typeof (schema as unknown as Record<string, unknown>)["toJsonSchema"] === "function" &&
+		typeof (schema as unknown as Record<string, unknown>)["assert"] === "function"
 	);
 }
 
