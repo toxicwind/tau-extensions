@@ -1,5 +1,5 @@
 {
-  "": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "tau-extensions",
   "owner": {
     "name": "toxicwind",
@@ -46,7 +46,7 @@
     },
     {
       "name": "omp-model-router",
-      "description": "Cost-optimized model routing for Tau/omp \u2014 routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs.",
+      "description": "Cost-optimized model routing for Tau/omp — routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs.",
       "version": "0.8.9",
       "source": "./omp-model-router",
       "category": "model-routing",
@@ -108,6 +108,23 @@
         "scraping"
       ],
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-agent-browser-native",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-kimi",
+      "description": "Drive Moonshot's kimi-code CLI from inside a Tau/omp session: non-interactive prompts, provider/model listing, config validation, and the kimi web UI. Supports KIMI_API_KEY.",
+      "version": "0.1.0",
+      "source": "./omp-kimi",
+      "category": "integration",
+      "keywords": [
+        "kimi",
+        "kimi-code",
+        "moonshot",
+        "agent",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kimi",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
     }
