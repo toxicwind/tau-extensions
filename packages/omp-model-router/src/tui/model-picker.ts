@@ -64,7 +64,7 @@ function modelToItem(model: Model): ModelItem | undefined {
 		provider: model.provider,
 		id: model.id,
 		name: model.name,
-		contextWindow: model.contextWindow,
+		contextWindow: model.contextWindow ?? 0,
 		costInput: model.cost?.input,
 		costOutput: model.cost?.output,
 	};
@@ -314,7 +314,7 @@ export class ModelPickerComponent implements Component {
 
 		const lines: string[] = [];
 		for (let i = start; i < end; i++) {
-			const item = this.#filtered[i];
+			const item = this.#filtered[i]!;
 			const isSelected = i === this.#selectedIndex;
 			const badge = this.#badgeFor(item);
 

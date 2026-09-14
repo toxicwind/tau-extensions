@@ -255,7 +255,7 @@ export function getConversationSummary(
 	let skippedLatestUser = false;
 
 	for (let i = context.messages.length - 1; i >= 0 && entries.length < maxTurns; i--) {
-		const msg = context.messages[i];
+		const msg = context.messages[i]!;
 		if (msg.role === "toolResult") continue;
 
 		if (msg.role === "assistant") {
@@ -270,7 +270,7 @@ export function getConversationSummary(
 			const plain = stripMarkdown(text);
 			// Skip clarification/meta replies — short and/or contain request-for-input phrases
 			if (plain.length < 20) continue;
-			const firstLine = plain.split("\n")[0].toLowerCase();
+			const firstLine = plain.split("\n")[0]!.toLowerCase();
 			if (/^(please |proceed |let me know|could you |can you provide|i need more|alternatively)/.test(firstLine)) continue;
 			const truncated = shakeForClassifier(sanitizeAngleBrackets(sanitizeRoleMarkers(plain)), maxMsgChars);
 			if (!truncated) continue;
@@ -342,7 +342,7 @@ export function detectSignals(context: Context): string[] {
 
 	// Collect recent user messages (last 6, excluding toolResult)
 	for (let i = context.messages.length - 1; i >= 0 && userMessages.length < 6; i--) {
-		const msg = context.messages[i];
+		const msg = context.messages[i]!;
 		if (msg.role === "user") {
 			const text = extractTextOnly(msg).trim().toLowerCase();
 			// Strip XML blocks for comparison
@@ -353,13 +353,13 @@ export function detectSignals(context: Context): string[] {
 
 	if (userMessages.length < 2) return signals;
 
-	const current = userMessages[0];
+	const current = userMessages[0]!;
 
 	// Repeated instruction: check if current message shares significant word overlap with recent history
 	const currentWords = new Set(current.split(/\s+/).filter(w => w.length > 3));
 	if (currentWords.size >= 2) {
 		for (let i = 1; i < userMessages.length; i++) {
-			const prevWords = new Set(userMessages[i].split(/\s+/).filter(w => w.length > 3));
+			const prevWords = new Set(userMessages[i]!.split(/\s+/).filter(w => w.length > 3));
 			let overlap = 0;
 			for (const w of currentWords) {
 				if (prevWords.has(w)) overlap++;
@@ -455,9 +455,9 @@ export function parseClassifierOutput(
 	const reasoningLine = lines.find((l) => l.toLowerCase().startsWith("reasoning:"));
 
 	if (tierLine) {
-		const tierValue = tierLine.split(":")[1].trim().toLowerCase();
+		const tierValue = tierLine.split(":")[1]!.trim().toLowerCase();
 		if (isRouterTier(tierValue)) {
-			const rawReasoning = reasoningLine ? reasoningLine.split(":")[1].trim() : "";
+			const rawReasoning = reasoningLine ? reasoningLine.split(":")[1]!.trim() : "";
 			// Reject template placeholders: "[one sentence]", "[high|medium|low]", "one sentence"
 			const isPlaceholder = !rawReasoning
 				|| rawReasoning.includes("|")
@@ -479,7 +479,7 @@ export function parseClassifierOutput(
 		const m = lower.match(/^["'\-*]*\s*(high|medium|low)\b/);
 		if (m && isRouterTier(m[1])) {
 			const afterTier = trimmed.slice(lower.indexOf(m[1]) + m[1].length).replace(/^[^a-z]*/i, "").trim();
-			const reasoning = afterTier || (reasoningLine ? reasoningLine.split(":")[1].trim() : "Classifier decision.");
+			const reasoning = afterTier || (reasoningLine ? reasoningLine.split(":")[1]!.trim() : "Classifier decision.");
 			return { tier: m[1], reasoning };
 		}
 	}

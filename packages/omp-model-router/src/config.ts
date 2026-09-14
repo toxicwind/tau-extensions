@@ -104,15 +104,15 @@ export const mergeConfig = (
 		const nextProfile = profile as Partial<RouterProfile>;
 		mergedProfiles[name] = {
 			high: {
-				...(existing?.high ?? FALLBACK_CONFIG.profiles.auto.high),
+				...(existing?.high ?? FALLBACK_CONFIG.profiles.auto!.high),
 				...(nextProfile.high ?? {}),
 			},
 			medium: {
-				...(existing?.medium ?? FALLBACK_CONFIG.profiles.auto.medium),
+				...(existing?.medium ?? FALLBACK_CONFIG.profiles.auto!.medium),
 				...(nextProfile.medium ?? {}),
 			},
 			low: {
-				...(existing?.low ?? FALLBACK_CONFIG.profiles.auto.low),
+				...(existing?.low ?? FALLBACK_CONFIG.profiles.auto!.low),
 				...(nextProfile.low ?? {}),
 			},
 		};
@@ -280,7 +280,7 @@ export const normalizeTierConfig = (
 export const normalizeConfig = (raw: RouterConfig): ConfigLoadResult => {
 	const warnings: string[] = [];
 	const normalizedProfiles: Record<string, RouterProfile> = {};
-	const fallbackAuto = FALLBACK_CONFIG.profiles.auto;
+	const fallbackAuto = FALLBACK_CONFIG.profiles.auto!;
 
 	for (const [name, profile] of Object.entries(raw.profiles ?? {})) {
 		const validTaskTypes: readonly string[] = ["coding", "research", "math", "writing", "summarization"];
