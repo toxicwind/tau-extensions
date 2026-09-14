@@ -110,6 +110,23 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-agent-browser-native",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "omp-best-of",
+      "description": "Best-of-N coding agents with LLM-as-a-verifier selection: runs N candidates in isolated git worktrees, ranks trajectories with a verifier model, and applies only the winning patch.",
+      "version": "0.2.0",
+      "source": "./omp-best-of",
+      "category": "agents",
+      "keywords": [
+        "best-of-n",
+        "verifier",
+        "worktree",
+        "coding-agent",
+        "sampling"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-best-of",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
     }
   ]
 }

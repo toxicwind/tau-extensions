@@ -21,3 +21,6 @@ Our own extensions are © toxicwind (MIT) unless noted in the package.
 
 - packages/pi-agent-browser-native
   Derived from fitchmultz/pi-agent-browser-native (MIT), version 0.6.12.
+
+- packages/omp-best-of
+  Derived from wolfiesch/omp-best-of (MIT), version 0.2.0.

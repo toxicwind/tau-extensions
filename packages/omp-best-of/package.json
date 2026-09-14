@@ -1,0 +1,67 @@
+{
+  "name": "omp-best-of",
+  "version": "0.2.0",
+  "packageManager": "bun@1.3.14",
+  "description": "OMP-powered isolated candidate agents with pluggable verifier selection",
+  "keywords": [
+    "oh-my-pi",
+    "omp",
+    "omp-plugin",
+    "coding-agent",
+    "best-of-n",
+    "llm-as-a-verifier",
+    "test-time-scaling",
+    "copy-on-write",
+    "deepseek"
+  ],
+  "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-best-of",
+  "bugs": {
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toxicwind/tau-extensions",
+    "directory": "packages/omp-best-of"
+  },
+  "license": "MIT",
+  "author": "Wolfgang Schoenberger (https://github.com/wolfiesch)",
+  "type": "module",
+  "bin": {
+    "omp-best-of": "src/cli.ts"
+  },
+  "scripts": {
+    "check": "bun run check:biome && bun run check:types && bun run check:catalog && bun run test",
+    "check:biome": "biome ci .",
+    "check:types": "tsc -p tsconfig.json --noEmit",
+    "check:catalog": "bun scripts/validate-catalog.ts",
+    "format": "biome check --write .",
+    "lint": "biome lint .",
+    "test": "bun test",
+    "smoke:verifier": "bun scripts/smoke-verifier.ts",
+    "smoke:package": "bun scripts/smoke-package.ts"
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": "^17"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.11",
+    "@oh-my-pi/pi-coding-agent": "^17.3.4",
+    "@types/bun": "^1.3.14",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "omp": {
+    "extensions": [
+      "./src/extension.ts"
+    ]
+  },
+  "files": [
+    "src",
+    "python",
+    "README.md",
+    "LICENSE",
+    "bunfig.toml"
+  ]
+}

@@ -1,0 +1,115 @@
+# Selection benchmark
+
+This harness answers one question: on a fixed pool of candidate patches, does verifier
+selection beat keeping a random candidate, and how much of the pool's headroom does it
+capture?
+
+Three numbers are reported over the same pool, so they are directly comparable:
+
+| Metric | Meaning |
+| --- | --- |
+| Random pass@1 | Expected result of keeping one candidate at random, that is the fraction of candidates that pass |
+| Verifier-selected | Result of keeping the candidate the verifier ranks first |
+| Oracle pass@N | Result of keeping the best candidate in the pool, the headroom selection could reach |
+
+Verifier-selected can never beat oracle pass@N. If random pass@1 already equals oracle
+pass@N the task is saturated, no selection method can help, and the run says so instead of
+implying a win.
+
+## Cost model
+
+Generation dominates, so the harness pays for it once per task and stores the entire pool
+under `bench/results/<run-id>/pool/`. `--reuse <run-id>` re-ranks a stored pool with
+different verifier settings and pays only for verification, which is what makes sweeps
+affordable.
+
+```bash
+bun bench/run.ts --n 4 --max-time 4m                 # generate pools and rank them
+bun bench/run.ts --n 4 --generate-only               # store pools without verifier cost
+bun bench/run.ts --reuse <run-id> --evaluations 4    # re-rank with the logprob backend
+bun bench/run.ts --reuse <run-id> \
+  --verifier-backend sampled \
+  --verifier-model openai-codex/gpt-5.6-luna \
+  --verifier-thinking high                            # stronger subscription-backed judge
+```
+
+Generation cost comes from the agent runtime's usage accounting. Sampled verification
+materializes each candidate's final repository, then adds two cached falsification passes
+through an OS-sandboxed probe tool. The workspace is read-only, credentials and user-home data
+are unavailable, network is disabled, and only private scratch storage is writable. The first
+pass must record one completed probe and the second must record three before pairwise ranking.
+A one-round five-candidate reuse run therefore makes at least 20 verifier invocations. A live
+run adds one capability-preflight invocation. Logprob verifier cost is computed from DeepSeek
+list prices in `VERIFIER_PRICE_PER_MTOK`. Sampled verifier cost is the OMP runtime's accounting
+estimate for its model route; subscription-routed usage is not billed per token. Neither number
+is an invoice.
+Tool-enabled audit invocations can consume multiple provider requests.
+
+## Labels
+
+Candidates only ever see `tasks/<id>/repo`. Labels come from `tasks/<id>/oracle`, which is
+copied into a throwaway scoring clone after the candidate has finished, under the visible
+name `oracle-check` because Bun's test runner skips dot-directories. Before scoring, the
+pristine visible tests are restored, so weakening or deleting a test cannot buy a pass.
+
+Two guards keep a labeling failure from turning into a fake result:
+
+- The harness counts declared test cases and refuses to label a candidate if fewer tests
+  ran than the fixture declares. A silently skipped oracle would otherwise mark every
+  candidate as passing.
+- `test/bench-fixtures.test.ts` proves, offline and in CI, that every fixture's shipped
+  defect fails its oracle and that the reference solution in `tasks/<id>/reference` passes
+  it. A fixture that is impossible or already correct cannot ship unnoticed.
+
+`tasks/<id>/reference` is never copied into a candidate worktree. It exists so the oracle is
+provably satisfiable.
+
+Every oracle case should map to an explicit sentence in `task.md`, including rejection,
+mutation, identity, ordering, concurrency, and malformed-input semantics. `--reuse`
+automatically rescores every stored patch against the current oracle before ranking, so
+generation-time `passed` labels cannot survive an oracle correction unnoticed.
+
+## Difficulty controls
+
+A pool only carries information when candidates disagree. Two flags reduce the candidate's
+advantage without touching the labels:
+
+- `--hide-tests` ships the fixture without its visible tests, so a candidate has no local
+  signal and must reason about the written contract. The oracle still restores and runs
+  those tests during scoring, so labels stay comparable across modes.
+- `--thinking <level>` passes a thinking level through to the candidate agent, which is also
+  how a caller trades candidate quality for cost in normal use.
+
+## Scorecard fields
+
+Every run first writes `bench/results/<run-id>/manifest.json`, before candidate generation,
+model-source setup, or verifier resolution. The manifest records its initial `started` state,
+then may record completion or failure time and status. It binds the source SHA and dirty state,
+resolved OMP binary path, hash, and version, Bun and OS identity, parsed options, ordered task
+IDs, run mode, cache policy, intended artifact root, sanitized argv, and a SHA-256 identity over
+canonical task IDs, options, and configuration. Scorecards reference this relative manifest path.
+
+The manifest records application-cache state as fresh or pool reuse, provider-cache state as
+`uncontrolled`, and generation reuse state. It does not prove a provider-global cold cache state:
+provider-side caching is outside the harness's control. External wrapper timeout is
+`unrecorded` unless the benchmark can obtain it explicitly. Absolute home paths and values named
+as credentials are redacted or normalized before persistence.
+
+Every run writes `scorecard.json` with source hash and dirty flag, `omp` version and binary
+hash, Bun version, platform, generator model, thinking level, whether the fixture shipped
+visible tests, verifier model and backend, evaluations, pivots, seed, per-candidate time
+limit, oracle timeout, label provenance, iteration count, the applicable price or sampled
+judge settings, and the raw pool paths. `summary.md` is the human-readable form of the same run.
+
+## Adding a task
+
+```
+tasks/<id>/
+  task.md                    prompt the candidate receives
+  repo/                       fixture the candidate edits, with a shipped defect
+  oracle/oracle.test.js       hidden contract, imports ../<module>.js
+  reference/<module>.js       reference solution, harness only
+```
+
+Then run `bun test test/bench-fixtures.test.ts`, which proves that the shipped visible tests
+pass, the shipped defect fails the hidden oracle, and the reference solution passes it.
