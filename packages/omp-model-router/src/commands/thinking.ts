@@ -34,7 +34,7 @@ export const handleThinking = (
 	const levelValues: readonly string[] = ["auto", ...THINKING_LEVELS];
 
 	if (args.length === 1) {
-		levelValue = args[0];
+		levelValue = args[0]!;
 		tier =
 			(resolveEffectivePin(state.scope, state.currentConfig).scopedPin
 				?? resolveEffectivePin(state.scope, state.currentConfig).floor)
@@ -43,12 +43,12 @@ export const handleThinking = (
 				? state.lastDecision.tier
 				: "medium");
 	} else if (args.length === 2) {
-		if (TIER_VALUES.includes(args[0]) || args[0] === "all") {
-			tier = args[0] as RouterTier | "all";
-			levelValue = args[1];
+		if (TIER_VALUES.includes(args[0]!) || args[0]! === "all") {
+			tier = args[0]! as RouterTier | "all";
+			levelValue = args[1]!;
 		} else {
-			profileName = args[0];
-			levelValue = args[1];
+			profileName = args[0]!;
+			levelValue = args[1]!;
 			tier =
 				(resolveEffectivePin(state.scope, state.currentConfig).scopedPin
 					?? resolveEffectivePin(state.scope, state.currentConfig).floor)
@@ -58,9 +58,9 @@ export const handleThinking = (
 					: "medium");
 		}
 	} else if (args.length === 3) {
-		profileName = args[0];
-		tier = args[1] as RouterTier | "all";
-		levelValue = args[2];
+		profileName = args[0]!;
+		tier = args[1]! as RouterTier | "all";
+		levelValue = args[2]!;
 	}
 
 	if (!state.currentConfig.profiles[profileName]) {

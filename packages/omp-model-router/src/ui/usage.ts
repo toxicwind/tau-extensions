@@ -314,7 +314,7 @@ export const renderUsageReport = (opts: UsageReportInput): string => {
 		const cal = opts.calibration;
 		if (cal.totalComparisons > 0) {
 			const mismatchRate = cal.llmCallsAttempted > 0
-				? (cal.totalComparisons - (cal.matrix[0][0] + cal.matrix[1][1] + cal.matrix[2][2])) / cal.totalComparisons
+				? (cal.totalComparisons - (cal.matrix[0]![0]! + cal.matrix[1]![1]! + cal.matrix[2]![2]!)) / cal.totalComparisons
 				: 0;
 			const agreementRate = 1 - mismatchRate;
 			const agreementPct = Math.round(agreementRate * 100);

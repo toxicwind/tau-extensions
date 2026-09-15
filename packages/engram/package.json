@@ -1,0 +1,21 @@
+{
+  "name": "engram",
+  "version": "6.48.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "omp": {
+    "extensions": [
+      "./extensions/engram-memory.mjs"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toxicwind/tau-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
+  },
+  "homepage": "https://github.com/toxicwind/tau-extensions#readme"
+}

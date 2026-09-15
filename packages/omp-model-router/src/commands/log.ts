@@ -159,8 +159,8 @@ export const handleLog = (
 
 function parseLastArg(args: string[]): number {
 	const idx = args.indexOf("--last");
-	if (idx >= 0 && args[idx + 1]) {
-		return parseInt(args[idx + 1], 10) || 20;
+	if (idx >= 0 && args[idx + 1]!) {
+		return parseInt(args[idx + 1]!, 10) || 20;
 	}
 	return 0;
 }
@@ -207,7 +207,7 @@ function discoverSessions(
 	for (const classifierPath of paths) {
 		const recs = parseJsonlFile(classifierPath);
 		const recordCount = recs.length;
-		const lastTimestamp = recordCount > 0 ? recs[recordCount - 1].timestamp : undefined;
+		const lastTimestamp = recordCount > 0 ? recs[recordCount - 1]!.timestamp : undefined;
 
 		// Try to read the session JSONL header for friendly metadata
 		let sessionId = "";
@@ -264,7 +264,7 @@ function discoverSessions(
 		const idx = entries.findIndex(e => e.path === currentPath);
 		if (idx > 0) {
 			const [cur] = entries.splice(idx, 1);
-			entries.unshift(cur);
+			entries.unshift(cur!);
 		}
 	}
 

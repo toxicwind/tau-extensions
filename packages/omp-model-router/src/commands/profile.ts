@@ -22,7 +22,7 @@ export const handleProfile = (
 			// Build profile entries
 			const profiles = profileNames(state.currentConfig).map((name) => ({
 				name,
-				profile: state.currentConfig.profiles[name],
+				profile: state.currentConfig.profiles[name]!,
 			}));
 
 			const onReload = async () => {

@@ -72,7 +72,7 @@ export function extractText(msg: Message, opts?: ExtractOptions): string {
  */
 export function getLastUserText(context: Context, opts?: ExtractOptions): string {
 	for (let i = context.messages.length - 1; i >= 0; i--) {
-		const msg = context.messages[i];
+		const msg = context.messages[i]!;
 		if (msg.role === "user") {
 			return extractText(msg, opts).trim();
 		}
@@ -148,7 +148,7 @@ export function extractRecentToolCalls(
 	const reversed: string[] = [];
 
 	outer: for (let i = context.messages.length - 1; i >= 0; i--) {
-		const msg = context.messages[i];
+		const msg = context.messages[i]!;
 		if (msg.role === "user") break; // stop at last user message (exclusive)
 		if (msg.role !== "assistant") continue;
 		if (!Array.isArray(msg.content)) continue;

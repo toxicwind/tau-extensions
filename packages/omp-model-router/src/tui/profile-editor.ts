@@ -109,7 +109,7 @@ export class ProfileEditorComponent implements Component {
 		if (chain.length === 0) return;
 		this.#draft[tier] = {
 			...this.#draft[tier],
-			model: chain[0],
+			model: chain[0]!,
 			fallbacks: chain.length > 1 ? chain.slice(1) : undefined,
 		};
 	}
@@ -136,7 +136,7 @@ export class ProfileEditorComponent implements Component {
 
 		// Render each row, with tier headers where tier changes
 		for (let i = 0; i < rows.length; i++) {
-			const row = rows[i];
+			const row = rows[i]!;
 			if (row.tier !== lastTier) {
 				lines.push(this.#renderTierHeader(row.tier));
 				lastTier = row.tier;
@@ -207,7 +207,7 @@ export class ProfileEditorComponent implements Component {
 		const cursor = isSelected ? "❯ " : "  ";
 
 		const chain = this.#getChainForTier(tier);
-		const modelRef = chain[chainIndex];
+		const modelRef = chain[chainIndex]!;
 
 		// Detect if this model is different from original
 		const origChain = this.#getOriginalChainForTier(tier);
@@ -329,7 +329,9 @@ export class ProfileEditorComponent implements Component {
 			if (row.kind === "chain" && row.chainIndex! > 0) {
 				const chain = this.#getChainForTier(row.tier);
 				const i = row.chainIndex!;
-				[chain[i - 1], chain[i]] = [chain[i], chain[i - 1]];
+				const prev = chain[i - 1]!;
+				chain[i - 1] = chain[i]!;
+				chain[i] = prev;
 				this.#setChainForTier(row.tier, chain);
 				// Keep cursor on moved item
 				this.#cursor -= 1;
@@ -343,7 +345,9 @@ export class ProfileEditorComponent implements Component {
 				const chain = this.#getChainForTier(row.tier);
 				const i = row.chainIndex;
 				if (i < chain.length - 1) {
-					[chain[i], chain[i + 1]] = [chain[i + 1], chain[i]];
+					const next = chain[i + 1]!;
+					chain[i + 1] = chain[i]!;
+					chain[i] = next;
 					this.#setChainForTier(row.tier, chain);
 					// Keep cursor on moved item
 					this.#cursor += 1;
@@ -587,7 +591,7 @@ export async function openRenameProfile(
 
 	// Rename by removing old key and adding new key
 	const updatedProfiles = { ...config.profiles };
-	updatedProfiles[newName] = updatedProfiles[source];
+	updatedProfiles[newName] = updatedProfiles[source]!;
 	delete updatedProfiles[source];
 
 	await patchConfigFile({ profiles: updatedProfiles });

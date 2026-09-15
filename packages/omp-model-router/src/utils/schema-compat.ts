@@ -54,8 +54,8 @@
 export function isArkTypeInstance(schema: unknown): schema is { toJsonSchema(opts?: unknown): Record<string, unknown> } {
 	return (
 		typeof schema === "function" &&
-		typeof (schema as Record<string, unknown>)["toJsonSchema"] === "function" &&
-		typeof (schema as Record<string, unknown>)["assert"] === "function"
+		typeof (schema as unknown as Record<string, unknown>)["toJsonSchema"] === "function" &&
+		typeof (schema as unknown as Record<string, unknown>)["assert"] === "function"
 	);
 }
 
@@ -130,8 +130,8 @@ function arkJsonAstToWire(node: unknown): JsonSchema {
 	if ("index" in n && Array.isArray(n["index"])) {
 		const indexEntries = n["index"] as Array<{ signature?: unknown; value?: unknown }>;
 		let valueSchema: JsonSchema = {};
-		if (indexEntries.length > 0 && indexEntries[0].value !== undefined) {
-			valueSchema = arkJsonAstToWire(indexEntries[0].value);
+		if (indexEntries.length > 0 && indexEntries[0]!.value !== undefined) {
+			valueSchema = arkJsonAstToWire(indexEntries[0]!.value);
 		}
 		const result: JsonSchema = { type: "object", additionalProperties: valueSchema };
 		if (meta) result["description"] = meta;

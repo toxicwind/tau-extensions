@@ -27,7 +27,7 @@ interface PromptLogOptions {
 function parseArgs(args: string[]): PromptLogOptions {
 	const opts: PromptLogOptions = {};
 	for (let i = 0; i < args.length; i++) {
-		const arg = args[i];
+		const arg = args[i]!;
 		if (arg === "--last") {
 			opts.last = parseInt(args[++i] ?? "10", 10) || 10;
 		} else if (arg === "--json") {
