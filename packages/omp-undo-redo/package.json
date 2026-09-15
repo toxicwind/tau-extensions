@@ -1,0 +1,86 @@
+{
+  "name": "@baylarsadigov/omp-undo-redo",
+  "version": "1.6.2",
+  "description": "Undo and redo session navigation for Pi and Oh My Pi",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi-coding-agent",
+    "undo",
+    "redo"
+  ],
+  "homepage": "https://github.com/toxicwind/tau-extensions#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toxicwind/tau-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "omp": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "files": [
+    "index.js",
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "clean": "node scripts/clean-dist.mjs",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "smoke:package": "node scripts/smoke-package.mjs",
+    "pack:check": "npm pack --dry-run",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run smoke:package && npm run pack:check"
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": ">=16.5.2"
+  },
+  "peerDependenciesMeta": {
+    "@oh-my-pi/pi-coding-agent": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@oh-my-pi/pi-coding-agent": "18.1.14",
+    "@types/node": "^26.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^10.9.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.11"
+  }
+}

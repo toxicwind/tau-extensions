@@ -144,6 +144,15 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/gsd-omp",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "omp-undo-redo",
+      "source": "packages/omp-undo-redo/package.json",
+      "description": "Undo/redo extension vendored from Baylar55/omp-undo-redo. Upstream MIT license retained; entry repointed from absent dist to src.",
+      "metadata": {
+        "pluginRoot": "packages",
+        "origin": "Baylar55/omp-undo-redo"
+      }
     }
   ]
 }
