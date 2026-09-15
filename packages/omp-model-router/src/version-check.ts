@@ -32,9 +32,9 @@ function parseVersion(version: string): [number, number, number] | undefined {
 		.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?(?:\+.*)?$/);
 	if (!match) return undefined;
 	return [
-		Number.parseInt(match[1], 10),
-		Number.parseInt(match[2], 10),
-		Number.parseInt(match[3], 10),
+		Number.parseInt(match[1]!, 10),
+		Number.parseInt(match[2]!, 10),
+		Number.parseInt(match[3]!, 10),
 	];
 }
 

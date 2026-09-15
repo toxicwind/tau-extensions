@@ -32,6 +32,6 @@ yarn-error.log*
 
 
 # Unpacked extensions / local test builds
-engram/
-semantouch/
-omp-extensions*
+/engram/
+/semantouch/
+/omp-extensions*

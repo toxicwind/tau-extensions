@@ -350,7 +350,7 @@ const truncateContext = (context: Context, limit: number): Context => {
 	let totalTokens = systemTokens;
 	const msgCosts = new Array<number>(messages.length);
 	for (let i = 0; i < messages.length; i++) {
-		const cost = estimateTokens(extractTextFromContent(messages[i].content));
+		const cost = estimateTokens(extractTextFromContent(messages[i]!.content));
 		msgCosts[i] = cost;
 		totalTokens += cost;
 	}
@@ -361,7 +361,7 @@ const truncateContext = (context: Context, limit: number): Context => {
 	let removed = 0;
 	const target = totalTokens - limit;
 	while (cutIndex < messages.length - 1 && removed < target) {
-		removed += msgCosts[cutIndex];
+		removed += msgCosts[cutIndex]!;
 		cutIndex++;
 	}
 
@@ -405,7 +405,7 @@ export const registerRouterProvider = (
 	const profileList = profileNames(state.currentConfig);
 
 	const modelDefinitions = profileList.map((name) => {
-		const profile = state.currentConfig.profiles[name];
+		const profile = state.currentConfig.profiles[name]!;
 		let contextWindow = 1_000_000;
 		let maxTokens = 64_000;
 
@@ -622,7 +622,7 @@ export const registerRouterProvider = (
 							}
 							if (modelsToTry[0] !== nonEmbargoed[0]) {
 								decision.isEmbargoed = true;
-								decision.embargoTimeRemaining = state.getEmbargoTimeRemaining(modelsToTry[0]);
+								decision.embargoTimeRemaining = state.getEmbargoTimeRemaining(modelsToTry[0]!);
 							}
 							modelsToTry = nonEmbargoed;
 						} else {
@@ -642,7 +642,7 @@ export const registerRouterProvider = (
 					let success = false;
 
 				for (let i = 0; i < modelsToTry.length; i++) {
-					const modelRef = modelsToTry[i];
+					const modelRef = modelsToTry[i]!;
 					const { provider: targetProvider, modelId: targetModelId } =
 						parseCanonicalModelRef(modelRef);
 
@@ -940,11 +940,11 @@ export const registerRouterProvider = (
 						const currentTierIdx = ROUTER_TIERS.indexOf(decision.tier);
 						// Lower tiers first (medium → low after high; low after medium)
 						for (let t = currentTierIdx + 1; t < ROUTER_TIERS.length; t++) {
-							tierOrder.push(ROUTER_TIERS[t]);
+							tierOrder.push(ROUTER_TIERS[t]!);
 						}
 						// Then higher tiers
 						for (let t = currentTierIdx - 1; t >= 0; t--) {
-							tierOrder.push(ROUTER_TIERS[t]);
+							tierOrder.push(ROUTER_TIERS[t]!);
 						}
 
 						const crossTierModels: string[] = [];
@@ -975,7 +975,7 @@ export const registerRouterProvider = (
 							}
 
 							for (let i = 0; i < viableCrossTier.length; i++) {
-								const modelRef = viableCrossTier[i];
+								const modelRef = viableCrossTier[i]!;
 								const { provider: targetProvider, modelId: targetModelId } =
 									parseCanonicalModelRef(modelRef);
 

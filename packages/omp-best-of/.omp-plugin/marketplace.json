@@ -1,0 +1,32 @@
+{
+	"$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+	"name": "omp-best-of",
+	"owner": {
+		"name": "Wolfgang Schoenberger"
+	},
+	"metadata": {
+		"description": "OMP-powered isolated candidate agents with pluggable verifier selection",
+		"version": "0.2.0"
+	},
+	"plugins": [
+		{
+			"name": "best-of",
+			"description": "Run OMP-powered candidate agents and select a patch with LLM-as-a-Verifier",
+			"source": "./",
+			"version": "0.2.0",
+			"author": {
+				"name": "Wolfgang Schoenberger"
+			},
+			"homepage": "https://github.com/wolfiesch/omp-best-of",
+			"repository": "https://github.com/wolfiesch/omp-best-of",
+			"license": "MIT",
+			"category": "development",
+			"keywords": [
+				"best-of-n",
+				"llm-as-a-verifier",
+				"test-time-scaling",
+				"git-worktree"
+			]
+		}
+	]
+}

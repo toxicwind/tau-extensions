@@ -30,7 +30,7 @@ export function initSessionCalibration(
 		const weight = config.globalPriorWeight;
 		for (let h = 0; h < 3; h++) {
 			for (let l = 0; l < 3; l++) {
-				matrix[h][l] = Math.floor(global.matrix[h][l] * weight);
+				matrix[h]![l] = Math.floor((global.matrix[h]?.[l] ?? 0) * weight);
 			}
 		}
 	}
@@ -55,7 +55,7 @@ export function updateCalibrationMatrix(
 ): void {
 	const h = tierToIndex(heuristicTier);
 	const l = tierToIndex(llmTier);
-	cal.matrix[h][l]++;
+	cal.matrix[h]![l]!++;
 	cal.totalComparisons++;
 }
 
@@ -82,7 +82,7 @@ export function applyCalibratedTier(
 	}
 
 	const h = tierToIndex(rawTier);
-	const row = cal.matrix[h]; // [llm_low, llm_medium, llm_high]
+	const row = cal.matrix[h]!; // [llm_low, llm_medium, llm_high]
 
 	const rowSum = row.reduce((a, b) => a + b, 0);
 	if (rowSum === 0) {
@@ -91,7 +91,7 @@ export function applyCalibratedTier(
 	}
 
 	const majorityIdx = argmax(row);
-	const confidence = row[majorityIdx] / rowSum;
+	const confidence = row[majorityIdx]! / rowSum;
 
 	// Override if: majority ≠ heuristic AND confidence >= threshold
 	if (majorityIdx !== h && confidence >= config.overrideThreshold) {
@@ -108,7 +108,7 @@ export function computeAgreementRate(cal: SessionCalibration): number {
 	if (cal.totalComparisons === 0) return 0;
 
 	// Diagonal = agreements
-	const agreements = cal.matrix[0][0] + cal.matrix[1][1] + cal.matrix[2][2];
+	const agreements = cal.matrix[0]![0]! + cal.matrix[1]![1]! + cal.matrix[2]![2]!;
 	return agreements / cal.totalComparisons;
 }
 
@@ -146,10 +146,10 @@ export function indexToTier(idx: number): RouterTier {
 
 function argmax(arr: number[]): number {
 	let maxIdx = 0;
-	let maxVal = arr[0];
+	let maxVal = arr[0]!;
 	for (let i = 1; i < arr.length; i++) {
-		if (arr[i] > maxVal) {
-			maxVal = arr[i];
+		if (arr[i]! > maxVal) {
+			maxVal = arr[i]!;
 			maxIdx = i;
 		}
 	}

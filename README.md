@@ -35,26 +35,25 @@ end
 
 ## Install
 
-Requires `omp >= 17.0.0`.
+Requires `omp >= 17.0.0` and [Bun](https://bun.sh) 1.3.x.
 
 ### Option A — clone the monorepo and link
 
 ```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/tau-extensions ~/.tau/agent/extensions/omp-extensions
-cd ~/.tau/agent/extensions/omp-extensions
+git clone --depth 1 --filter=blob:none --sparse https://github.com/toxicwind/tau-extensions ~/.tau/agent/extensions/tau-extensions
+cd ~/.tau/agent/extensions/tau-extensions
 git sparse-checkout set packages/omp-kafka
 cd packages/omp-kafka
 bun install
 omp plugin link .
 ```
 
-The whole monorepo can be cloned if you want both extensions — drop `--filter=blob:none --sparse` and the `sparse-checkout` lines.
+Drop `--filter=blob:none --sparse` and the `sparse-checkout` lines to clone everything. Swap `packages/omp-kafka` for any package from the table above.
 
 ### Option B — install via npm (once published)
 
 ```bash
 bun add -g @toxicwind/omp-kafka
-bun add -g @toxicwind/omp-edit-committer
 ```
 
 Then add to `~/.tau/agent/config.yml`:
@@ -62,26 +61,26 @@ Then add to `~/.tau/agent/config.yml`:
 ```yaml
 extensions:
   - @toxicwind/omp-kafka
-  - @toxicwind/omp-edit-committer
 ```
 
 ### Option C — load once for a single session
 
 ```bash
-omp --extension /path/to/omp-extensions/packages/omp-kafka
-omp --extension /path/to/omp-extensions/packages/omp-edit-committer
+omp --extension /path/to/tau-extensions/packages/omp-kafka
 ```
 
 ## Development
 
+Requires **Bun 1.3.x** — lockfiles are generated with 1.3.x and CI installs with `--frozen-lockfile`.
+
 ```bash
 bun install
-bun run --workspaces test
-bun run --workspaces typecheck
+bun run test        # bun test packages/*
+bun run typecheck   # bun scripts/typecheck.mjs
 ```
 
-All packages typecheck and test cleanly. `node_modules/` stays minimal — only declared dependencies, no transitive junk.
+All packages typecheck and test cleanly (enforced in CI).
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE). Vendored forks retain their upstream MIT licenses; see [NOTICE](./NOTICE) for attribution.

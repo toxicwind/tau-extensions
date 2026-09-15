@@ -26,3 +26,13 @@ Our own extensions are © toxicwind (MIT) unless noted in the package.
 
 - packages/pi-agent-browser-native
   Derived from fitchmultz/pi-agent-browser-native (MIT), version 0.6.12.
+
+- packages/omp-best-of
+  Derived from wolfiesch/omp-best-of (MIT), version 0.2.0.
+
+- packages/gsd-omp
+  Derived from tchivs/gsd-omp (MIT), version 1.0.24. Ships as CommonJS; loader entry is ./src/extension.cjs.
+
+- packages/omp-undo-redo
+  Derived from Baylar55/omp-undo-redo (MIT), version 1.6.2.
+Vendored from thebtf/engram (memory extension, locally adapted; MIT, Kirill Turanskiy).

@@ -1,0 +1,400 @@
+# OMP Best Of
+
+[![CI](https://github.com/wolfiesch/omp-best-of/actions/workflows/ci.yml/badge.svg)](https://github.com/wolfiesch/omp-best-of/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Run several OMP-powered candidate agents on the same task in isolated copy-on-write workspaces, rank their complete trajectories with either [LLM-as-a-Verifier](https://github.com/llm-as-a-verifier/llm-as-a-verifier) or an OMP subscription-backed sampled judge, and optionally apply the selected patch.
+
+```text
+/best-of --n 5 --apply Fix the failing authentication test
+```
+
+## Why this exists
+
+Sampling several solutions raises the chance that at least one is correct, but selecting among them remains a separate problem. This plugin provides OMP orchestration, pluggable verifier selection, inspectable artifacts, and opt-in patch application. Selection quality depends on the candidates, criteria, verifier model, and endpoint.
+
+The default logprob backend uses the tournament algorithm from Kwok et al. through the upstream `llm-verifier` Python package rather than a reimplementation. The sampled backend is a separate conventional pairwise judge, not the paper's continuous-score method. Published benchmark results belong to the upstream authors; this plugin has not established equivalent reliability.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Clean checkout at HEAD] --> B{Preflight}
+    B -->|dirty tree| X[Refuse]
+    B -->|clean| C[N OMP isolation workspaces]
+    C --> D1[Candidate 1]
+    C --> D2[Candidate 2]
+    C --> D3[Candidate N]
+    D1 --> E[Trajectory, patch, exit code, usage]
+    D2 --> E
+    D3 --> E
+    E --> F[Configured verifier backend]
+    F --> G{--apply?}
+    G -->|no| H[Artifacts only]
+    G -->|yes| I[HEAD unchanged? apply winner]
+```
+
+1. **Preflight.** Resolve the repository root, refuse a dirty working tree, and record `HEAD`. In sampled mode the local audit-sandbox preflight runs next, and the single paid verifier capability probe runs only after that check passes.
+2. **Fan out.** Capture one clean baseline, then create an OMP-managed isolation workspace per candidate. OMP selects the host's best copy-on-write backend and falls back to a Git worktree when needed.
+3. **Generate.** Run one headless Oh My Pi session per isolated workspace, concurrently, in JSON event mode with extensions and sessions disabled.
+4. **Collect.** Parse each transcript and use OMP's baseline-aware delta capture to produce a binary-safe patch.
+5. **Rank.** Use either the upstream continuous-logprob tournament or a seeded sampled pairwise round robin over the eligible trajectories.
+6. **Select.** Apply the winner only when `--apply` is given, and only when the parent `HEAD` and status are still unchanged.
+7. **Clean.** Tear down every OMP isolation workspace, whether the run succeeded or failed. Artifacts are always kept.
+
+A candidate that exits non-zero, or whose patch cannot be captured, is excluded before ranking. With a single surviving candidate the verifier is skipped and reported as such.
+
+## Requirements
+
+| Requirement | Notes |
+| --- | --- |
+| Oh My Pi 17 or newer | Provides the extension API, the `omp` binary, and credentials |
+| Bun 1.3 or newer | Runtime for the plugin and its CLI |
+| Git | Repository baseline capture, isolation fallback, and patch application |
+| `uv` | Required only by the logprob backend; runs the pinned `llm-verifier==0.2.0` sidecar |
+| A verifier route in omp | Logprob mode needs a score-capable API endpoint; sampled mode can invoke an OMP subscription model |
+| Clean working tree | Enforced before any candidate starts |
+
+Candidates inherit the calling session's model and thinking level, so `/best-of` runs
+what you are already running; `--model` and `--thinking` override that. Verification is
+separate and defaults to the `logprob` backend with `deepseek/deepseek-v4-flash`.
+Sampled verification defaults to low reasoning; `--verifier-thinking` changes the judge
+without changing candidate generation.
+
+The default logprob backend resolves credentials through omp's model registry. DeepSeek V4
+Flash is the default because its native score-tag path is known to work. Other endpoints
+must prove the constrained-prefill behavior required by `llm-verifier==0.2.0`; the plugin
+sends a one-token capability probe before generation and refuses endpoints that ignore or
+reject that contract. Compatible self-hosted vLLM and SGLang endpoints are eligible.
+
+The sampled backend invokes the named verifier through the `omp` binary instead of a
+provider API client. This supports subscription-authenticated routes such as
+`openai-codex/gpt-5.6-luna` without API credits:
+
+```text
+/best-of --model openai-codex/gpt-5.6-luna --verifier-backend sampled \
+  --verifier-model openai-codex/gpt-5.6-luna Fix the failing test
+```
+
+Sampled startup is ordered so the cheapest check fails first. The repository check runs
+before anything else, then a local audit-sandbox preflight proves the OS-sandboxed probe
+can actually execute on this host, then one paid model capability probe proves the OMP
+route works, and only then does candidate generation begin. A failed sandbox preflight
+starts no candidate subprocess and makes no model or provider call. Sampled mode does not
+receive token logprobs and must not be presented as a reproduction of LLM-as-a-Verifier's
+continuous scoring.
+
+## Install
+
+From the marketplace:
+
+```bash
+omp plugin marketplace add wolfiesch/omp-best-of
+omp plugin install best-of@omp-best-of
+```
+
+From a local clone:
+
+```bash
+git clone https://github.com/wolfiesch/omp-best-of.git
+cd omp-best-of
+bun install
+omp plugin link .
+```
+
+Restart Oh My Pi after installing, then confirm the plugin is healthy:
+
+```bash
+omp plugin doctor omp-best-of
+```
+
+## Usage
+
+Inside a session, selection only, leaving the checkout untouched:
+
+```text
+/best-of --n 5 Refactor the parser and preserve its public API
+```
+
+Inside a session, applying the winning patch:
+
+```text
+/best-of --n 3 --apply Fix the failing authentication test
+```
+
+As a standalone command, useful from scripts and CI:
+
+```bash
+omp-best-of --n 3 --apply -- "Fix the failing authentication test"
+```
+
+The standalone form writes progress to stderr and a JSON summary to stdout. `selection.winnerIndex` is always zero based and is `null` when `--no-verify` skips selection. `application.requested` records intent; `application.applied` is true only when a non-empty patch changed the parent checkout.
+
+### Options
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--n <2-8>` | `3` | Number of isolated candidates |
+| `--model <provider/model>` | session model | Candidate model; every model slot in the child agent is pinned to it |
+| `--verifier-model <model>` | `deepseek/deepseek-v4-flash` | Verifier model selector; an API-scoring model for `logprob`, or an OMP model for `sampled` |
+| `--verifier-backend <mode>` | `logprob` | `logprob` for upstream LLM-as-a-Verifier or `sampled` for an OMP-backed pairwise judge |
+| `--verifier-timeout <duration>` | `2m` | Per-verifier-call wall-clock limit for either backend; raise it for slower sampled judges |
+| `--evaluations <n>` | `1` | Repeated logprob evaluations or complete sampled pairwise rounds |
+| `--pivots <n>` | `2` | Pivots in the logprob tournament; ignored by sampled mode |
+| `--max-time <duration>` | `20m` | Per-candidate wall-clock limit, such as `90s`, `20m`, `2h` |
+| `--thinking <level>` | session level | Candidate thinking level, such as `off`, `low`, `high`; trades candidate quality for cost |
+| `--seed <n>` | `0` | Tournament seed |
+| `--apply` | off | Apply the winning patch to the parent checkout |
+| `--select-only` | on | Rank and keep artifacts without touching the checkout |
+| `--no-verify` | off | Generate and retain candidate artifacts without ranking; cannot be combined with `--apply` |
+| `--help` | | Print usage |
+
+### Environment
+
+| Variable | Purpose |
+| --- | --- |
+| `OMP_BEST_OF_PYTHON` | Run the bridge with an existing interpreter instead of `uv`. That interpreter must already provide `llm-verifier` |
+| `OMP_BEST_OF_VERIFIER_BRIDGE` | Override the bridge script path |
+| `OMP_BEST_OF_OMP_BIN` | Override the `omp` binary used for candidates and sampled judgments |
+| `PI_CODING_AGENT_DIR` | Moves the artifact root and the shared sampled cache root along with the Oh My Pi agent directory |
+
+## Verification mechanics
+
+Two verifier backends are available:
+
+- **`logprob` (default).** The upstream framework computes continuous expected scores from
+  score-token distributions, repeats evaluations to reduce variance, decomposes the rubric,
+  and uses its probabilistic pivot tournament. This is the paper's method and requires a
+  compatible scoring endpoint.
+- **`sampled`.** OMP materializes each candidate's final repository in a disposable workspace
+  and audits it twice for contract-valid counterexamples. Audits use an OS-sandboxed probe:
+  the candidate workspace is read-only, credentials and user-home data are unavailable,
+  network access is disabled, and only private scratch storage is writable. The first pass
+  must record one completed probe; the second must record three while challenging the first
+  pass's conclusions. OMP then asks the selected subscription model for a pairwise probability
+  for every unordered pair. Pairwise judges receive the combined audits and probe evidence as
+  untrusted leads and must verify each finding against the patch. Candidate orientation and
+  call order are seeded, up to four calls run concurrently, and pairwise-majority wins determine
+  the ranking. A candidate's weakest head-to-head probability breaks majority cycles, followed
+  by expected win probability. Semantic contract violations are decisive; validation quality
+  is only a tie-breaker. `--evaluations` repeats the pairwise round robin. Results are cached
+  after every call, in the shared exact-input cache described below.
+
+Both backends use the same three criteria:
+
+| Criterion | Question |
+| --- | --- |
+| Requirements | Does the resulting repository state satisfy every explicit requirement in the task? |
+| Correctness | Do the implementation and observed tool outputs support that the change is correct, including important edge cases? |
+| Verification | Did the agent run relevant validation and interpret its results accurately without hiding failures? |
+
+In logprob mode, ranking uses the upstream probabilistic pivot tournament rather than all
+pairs. A cyclic ring pass gives every candidate one comparison, then leaders become pivots.
+Sampled judgments receive the patch, recorded tool calls/results, and process result while
+excluding assistant reasoning and final claims. Candidate audits inspect each disposable final
+workspace and retain completed sandboxed probe evidence, including nonzero exits. This preserves
+concrete evidence without letting candidate-authored validation narration outweigh implementation
+semantics.
+
+### Sampled caches
+
+Sampled results are cached under the agent data directory rather than inside a timestamped
+run directory, so an interrupted or repeated run reuses the calls it already paid for:
+
+```text
+${PI_CODING_AGENT_DIR:-~/.omp/agent}/best-of/cache/sampled/<digest>.json
+```
+
+The cache is private to the invoking user. The cache directory uses mode `0700` and cache
+files use `0600`.
+
+Each digest covers the exact inputs a judgment depends on: the repository `HEAD`, the exact
+task text, the criteria, the per-candidate evidence, the verifier model, the verifier
+thinking level, the evaluation count, the seed, the prompt and settings identity, and which
+audit tools were available. Any change to any of those resolves a different cache file, so a
+repository, input, model, settings, or tool-availability change is invalidated cleanly instead
+of being rewritten in place or read back as a stale hit. An identical rerun resolves the same
+file and reuses it.
+
+Reuse is local to this machine and this user. There is no provider-global, cross-user, or
+cross-machine cache, and no provider-side caching is claimed. Public result metadata reports
+cache reuse without recording any absolute cache path. The cache file itself is schema
+versioned, and a file written by an older schema is rejected and recomputed rather than
+misread.
+
+### Retry attribution
+
+Every candidate-audit invocation attempt is recorded before another attempt starts, so a run
+that had to retry still explains what it spent. Each record identifies the candidate, the
+round, the attempt ordinal, the outcome status of accepted, insufficient probes, or error,
+the required and observed probe counts, the attempt's usage, and, for an error, a bounded
+sanitized message.
+
+The result carries an aggregate of total attempts, accepted attempts, discarded attempts,
+error attempts, provider requests, and per-candidate and per-round attempt counts. Audit
+attempts are a distinct quantity from the underlying provider requests: one attempt can
+issue several provider requests when the audit uses tools, and a discarded under-probed
+attempt or a failed attempt still consumed provider requests before it was thrown away.
+Discarded under-probed attempts and errors are counted separately from accepted ones.
+
+Attribution is reporting only. Selection and ranking behavior is unchanged by it.
+
+## Cost and latency model
+
+Total work is `N` generation runs plus verification. Two properties matter when budgeting:
+
+- Logprob verification is comparison heavy and can itself consume substantial reasoning
+  tokens. Sampled ranking uses $2N + E N(N-1)/2$ verifier invocations for $N$ candidates
+  and $E$ pairwise evaluations: 14 invocations for four candidates and 44 for eight at one
+  evaluation. A live run adds one paid capability-preflight invocation; the audit-sandbox
+  preflight that precedes it is local and costs nothing. The first $2N$ ranking
+  calls are two independent candidate audits; the second pass receives and challenges the
+  first.
+  One verifier invocation can contain multiple provider requests when an audit uses tools,
+  and a retried audit spends provider requests on every attempt, not only the accepted one.
+- Candidates run concurrently. Each sampled audit pass and the comparison stage run up to
+  four calls at a time, so wall clock is lower than the sum of call durations.
+
+Every run reports candidate and verifier token usage. Sampled-mode `reported_cost_usd` is
+OMP runtime accounting, not an incremental bill for subscription-routed usage. Subscription
+plans still impose provider usage limits.
+
+Reused sampled cache entries cost nothing on a rerun with identical inputs.
+
+For reference, the upstream project reports the following on Terminal-Bench 2.1 with DeepSeek V4 Flash for both generation and verification:
+
+| Configuration | Random pass@1 | Verifier-selected | Oracle |
+| --- | --- | --- | --- |
+| Best-of-3 | 79.4% | 86.5% | 92.1% |
+| Best-of-5 | 78.7% | 88.0% | 96.6% |
+
+Those results belong to the upstream authors and have not been reproduced here. Nothing in this repository should be read as an independent benchmark.
+
+### Measured on this repository
+
+`bench/` pays for candidate pools once, labels every candidate with a hidden oracle, then
+compares selection methods over the same stored pools. Two measurements survive review:
+
+| Backend and setting | Verifier-selected | Random pass@1 | Oracle | Scope | RESULTS section |
+| --- | ---: | ---: | ---: | --- | --- |
+| Logprob, 1 evaluation | 5/10 (50.0%) | 62.5% | pass@4 100% | 10 selections over two reused discriminating tasks | [v0.1.1 fixed-pool verifier sweep](bench/RESULTS.md#v011-fixed-pool-verifier-sweep) |
+| Sampled Luna, 1 round, source `06eefab` | 13/15 (86.7%) | 32.0% | pass@5 100% | 15 selections over five reused, deliberately discriminating pools | [Executable candidate falsification](bench/RESULTS.md#executable-candidate-falsification) |
+
+The sampled row is historical evidence for ancestor commit `06eefab`, not evidence for the
+current head; later commits have not been remeasured. Its tracked, sanitized aggregate is
+[`bench/evidence/candidate-falsification-evidence.json`](bench/evidence/candidate-falsification-evidence.json),
+while raw run directories stay off-repo.
+
+Earlier six-pool sampled headlines of 83.3% and 72.2% are withdrawn. Two of those pools,
+`content-type` and `http-range`, had defective oracles, and no candidate passes the corrected
+oracles, so no selection accuracy on this repository rests on them.
+
+These are harness measurements, not general coding-agent accuracy estimates. The task banks
+are small, reused, and intentionally discriminating; `json-patch` remains the weakest pool at
+2/3. On the logprob bank, three evaluations per criterion tripled cost without improving
+selection, which is why the default stays at one.
+[`bench/RESULTS.md`](bench/RESULTS.md) records the exact source identities, models, cache
+state, token accounting, costs, exclusions, and raw artifact locations.
+
+## Artifacts
+
+Every run writes a durable directory, by default under `~/.omp/agent/best-of/runs/<run-id>/`:
+
+```text
+<run-id>/
+  candidate-1/
+    events.jsonl      raw Oh My Pi JSON event stream
+    trajectory.md     rendered transcript
+    changes.patch     binary-safe patch against the run HEAD
+    stderr.log        candidate stderr and patch capture errors
+  candidate-2/ ...
+  verifier-cache.json run-local verifier score cache
+  winner.patch        written only when a non-empty patch is applied
+  result.json         versioned summary, selection, application, ranking, usage, timings
+```
+
+Run and candidate directories use mode `0700`; artifact files use `0600`. `result.json`
+contains compact candidate summaries and relative artifact paths rather than full
+transcripts, patches, stderr, or temporary workspace paths.
+
+Sampled reuse does not live here. Sampled judgments key their cache by exact input under the
+shared `best-of/cache/sampled/` directory described in [Sampled caches](#sampled-caches), so
+reuse survives across runs instead of being trapped in one timestamped run directory.
+
+Losing candidates are kept, so a rejected patch can still be inspected, replayed, or applied by hand.
+
+## Safety model
+
+- Each candidate gets an OMP-managed isolation workspace from the recorded clean baseline. OMP prefers the host's native copy-on-write backend and falls back to a Git worktree when necessary. This prevents repository patch collisions; it is not an OS sandbox or host-isolation boundary.
+- The run refuses to start from a dirty working tree and rechecks the parent after generation and before application.
+- Selection is the default. `--no-verify` reports that no selection was performed; it never promotes the first surviving candidate.
+- Without `--apply`, patches stay in the artifact directory. `application.applied` is true only when a non-empty selected patch changes the checkout.
+- Applying uses `git apply --check` before the real apply, so a conflicting patch fails without partial writes.
+- Candidate agents do not commit, and the plugin never pushes, tags, or rewrites history.
+- Candidate and verifier subprocesses run in dedicated POSIX process groups. Timeout or caller cancellation sends `SIGTERM`, escalates to `SIGKILL`, waits for all candidate processes to settle, then cleans their workspaces.
+- Candidate agents run as headless OMP subprocesses in `yolo` approval mode with sessions and extensions disabled. They do not appear in Agent Hub or native subagent lifecycle surfaces, and they can technically access the host filesystem and network.
+
+## Development
+
+```bash
+bun install
+bun run check          # Biome, type check, catalog validation, and tests
+bun run smoke:package  # pack, install in a clean temp project, and launch CLI help
+bun run smoke:verifier # live verifier round trip through omp credentials, needs network
+bun run smoke:verifier <provider/model> # same, against another verifier you have credentials for
+bun bench/run.ts --help # selection benchmark, spends money on model calls
+```
+
+`bun run check` and `bun run smoke:package` are offline after dependencies are installed.
+The verifier smoke script makes real calls and confirms credentials and the Python bridge
+end to end.
+
+Layout:
+
+```text
+src/extension.ts             Oh My Pi command registration, progress widget, result reporting
+src/runner.ts                OMP isolation, candidate execution, ranking, patch application
+src/model.ts                 verifier endpoint and credential resolution through omp's registry
+src/verifier.ts              JSON contract with the Python logprob bridge
+src/sampled-verifier.ts      sandboxed candidate audits, seeded pairwise judging, caching, progress
+src/audit-probe-extension.ts OS-sandboxed probe tool handed to the audit agent
+src/transcript.ts            JSON event stream parsing and usage aggregation
+src/process.ts               process-group command execution, timeouts, cancellation
+src/artifacts.ts             private-mode artifact directories and files
+src/types.ts                 shared option, result, progress, and usage contracts
+src/type-guards.ts           narrow runtime shape checks for parsed payloads
+src/args.ts                  flags, defaults, criteria, help text
+src/cli.ts                   standalone entry point
+scripts/validate-catalog.ts  plugin catalog and manifest validation
+scripts/smoke-package.ts     pack, install in a clean temp project, launch CLI help
+scripts/smoke-verifier.ts    live verifier round trip through omp credentials
+bench/run.ts                 selection benchmark, pool storage, scorecards
+bench/oracle.ts              fixture materialization and hidden-oracle labeling
+bench/tasks/                 benchmark fixtures: prompt, repo, oracle, reference solution
+bench/RESULTS.md             measured results, scope limits, and exclusions
+bench/evidence/              tracked sanitized benchmark aggregates
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+## Attribution
+
+The verification algorithm and the Python package are the work of Kwok et al.
+
+- Paper: [LLM-as-a-Verifier: A General-Purpose Verification Framework](https://arxiv.org/abs/2607.05391)
+- Code: [llm-as-a-verifier/llm-as-a-verifier](https://github.com/llm-as-a-verifier/llm-as-a-verifier), MIT licensed
+
+```bibtex
+@misc{kwok2026llmasaverifier,
+  title  = {LLM-as-a-Verifier: A General-Purpose Verification Framework},
+  author = {Jacky Kwok and Shulu Li and Pranav Atreya and Yuejiang Liu and Yixing Jiang and Chelsea Finn and Marco Pavone and Ion Stoica and Azalia Mirhoseini},
+  year   = {2026},
+  eprint = {2607.05391},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI}
+}
+```
+
+## License
+
+[MIT](LICENSE)

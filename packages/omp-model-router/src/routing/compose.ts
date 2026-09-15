@@ -74,7 +74,7 @@ const promoteForContextCapacity = (
 
 	const startIdx = TIER_ORDER.indexOf(currentTier) + 1;
 	for (let i = startIdx; i < TIER_ORDER.length; i++) {
-		const candidate = TIER_ORDER[i];
+		const candidate = TIER_ORDER[i]!;
 		const cap = tierUsableCapacity(candidate, profile, registry);
 		if (cap !== undefined && tokens <= cap) {
 			return { tier: candidate, fromCapacity: currentCapacity, toCapacity: cap, fits: true };
@@ -83,10 +83,10 @@ const promoteForContextCapacity = (
 	// No tier fits; promote to highest tier with biggest capacity (best-effort).
 	let best: PromotedTier | undefined;
 	for (let i = startIdx; i < TIER_ORDER.length; i++) {
-		const cap = tierUsableCapacity(TIER_ORDER[i], profile, registry);
+		const cap = tierUsableCapacity(TIER_ORDER[i]!, profile, registry);
 		if (cap === undefined) continue;
 		if (!best || cap > best.toCapacity) {
-			best = { tier: TIER_ORDER[i], fromCapacity: currentCapacity, toCapacity: cap, fits: false };
+			best = { tier: TIER_ORDER[i]!, fromCapacity: currentCapacity, toCapacity: cap, fits: false };
 		}
 	}
 	return best;

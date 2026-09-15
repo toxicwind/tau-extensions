@@ -32,7 +32,7 @@ export function analyzeTrace(trace: ParsedTrace): AnalyzeStats {
 			completed++;
 			const h = tierToIndex(rec.heuristicDecision.tier);
 			const l = tierToIndex(rec.llmDecision.tier);
-			matrix[h][l]++;
+			matrix[h]![l]!++;
 			if (rec.heuristicDecision.tier === rec.llmDecision.tier) {
 				agreements++;
 			} else {
@@ -95,9 +95,9 @@ export function formatAnalysisTable(stats: AnalyzeStats): string {
 		lines.push("Confusion Matrix (heuristic rows × LLM cols):");
 		lines.push("           low    medium  high");
 		for (let h = 0; h < 3; h++) {
-			const row = stats.matrix[h];
+			const row = stats.matrix[h]!;
 			lines.push(
-				`  ${TIER_LABELS[h].padEnd(8)} ${pad(row[0])}  ${pad(row[1])}  ${pad(row[2])}`,
+				`  ${TIER_LABELS[h]!.padEnd(8)} ${pad(row[0]!)}  ${pad(row[1]!)}  ${pad(row[2]!)}`,
 			);
 		}
 		lines.push("");

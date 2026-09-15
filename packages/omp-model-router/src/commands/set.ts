@@ -34,7 +34,7 @@ export const handleSet = (
 		return;
 	}
 
-	const key = args[0];
+	const key = args[0]!;
 	const value = args.slice(1).join(" ");
 
 	const globalPath = join(getAgentDir(), "model-router.json");

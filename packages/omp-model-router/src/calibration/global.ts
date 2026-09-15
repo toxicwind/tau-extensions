@@ -61,7 +61,7 @@ export function mergeSessionIntoGlobal(
 	// Merge matrix counts
 	for (let h = 0; h < 3; h++) {
 		for (let l = 0; l < 3; l++) {
-			global.matrix[h][l] += session.matrix[h][l];
+			global.matrix[h]![l] = (global.matrix[h]?.[l] ?? 0) + session.matrix[h]![l]!;
 		}
 	}
 

@@ -149,7 +149,7 @@ export class ClassifierSettingsComponent implements Component {
 			lines.push(`  ${t.fg("muted", "(none configured — ctrl+a to add)")}`);
 		} else {
 			for (let i = 0; i < models.length; i++) {
-				lines.push(this.#renderModelRow(rows, i, models[i]));
+				lines.push(this.#renderModelRow(rows, i, models[i]!));
 			}
 		}
 		lines.push("");
@@ -328,7 +328,7 @@ export class ClassifierSettingsComponent implements Component {
 		}
 		if ((isConfirm || isSpace) && row.kind === "mode") {
 			const idx = MODE_CYCLE.indexOf(this.#draft.mode);
-			this.#draft.mode = MODE_CYCLE[(idx + 1) % MODE_CYCLE.length];
+			this.#draft.mode = MODE_CYCLE[(idx + 1) % MODE_CYCLE.length]!;
 			return;
 		}
 		if ((isConfirm || isSpace) && row.kind === "warmupTurns") {
@@ -374,7 +374,9 @@ export class ClassifierSettingsComponent implements Component {
 			if (row.kind === "model" && row.modelIndex !== undefined && row.modelIndex > 0) {
 				const models = this.#getModels();
 				const i = row.modelIndex;
-				[models[i - 1], models[i]] = [models[i], models[i - 1]];
+				const prevModel = models[i - 1]!;
+				models[i - 1] = models[i]!;
+				models[i] = prevModel;
 				this.#setModels(models);
 				// Keep cursor on the moved item
 				this.#cursor -= 1;
@@ -388,7 +390,9 @@ export class ClassifierSettingsComponent implements Component {
 				const models = this.#getModels();
 				const i = row.modelIndex;
 				if (i < models.length - 1) {
-					[models[i], models[i + 1]] = [models[i + 1], models[i]];
+					const nextModel = models[i + 1]!;
+					models[i + 1] = models[i]!;
+					models[i] = nextModel;
 					this.#setModels(models);
 					// Keep cursor on the moved item
 					this.#cursor += 1;

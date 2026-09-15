@@ -196,7 +196,7 @@ export class ProfileListComponent implements Component {
 	render(width: number): string[] {
 		// If a sub-view (ProfileEditor) is active, delegate rendering to it.
 		if (this.#subView) {
-			return this.#subView.render(width);
+			return [...this.#subView.render(width)];
 		}
 
 		const t = this.#theme;
