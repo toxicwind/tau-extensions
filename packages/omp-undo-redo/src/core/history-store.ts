@@ -223,11 +223,11 @@ export function reconstructSessionHistory(reader: SessionReader): NavigationStat
   const checkpoints: TurnCheckpoint[] = [];
   for (let index = 0; index < branch.length; index++) {
     const entry = branch[index];
-    if (entry!.type !== "message" || entry!.message?.role !== "user") continue;
+    if (entry.type !== "message" || entry.message?.role !== "user") continue;
     let leafIndex = index;
     while (
       leafIndex + 1 < branch.length &&
-      !(branch[leafIndex + 1]!.type === "message" && branch[leafIndex + 1]!.message?.role === "user")
+      !(branch[leafIndex + 1].type === "message" && branch[leafIndex + 1].message?.role === "user")
     ) {
       leafIndex++;
     }
@@ -235,8 +235,8 @@ export function reconstructSessionHistory(reader: SessionReader): NavigationStat
     checkpoints.push({
       kind: "session",
       reason: "resumed_checkpoint_unavailable",
-      parentLeafId: entry!.id,
-      leafId: branch[leafIndex]!.id,
+      parentLeafId: entry.id,
+      leafId: branch[leafIndex].id,
     });
     index = leafIndex;
   }

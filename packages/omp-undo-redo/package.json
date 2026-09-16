@@ -10,11 +10,10 @@
     "undo",
     "redo"
   ],
-  "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-undo-redo",
+  "homepage": "https://github.com/toxicwind/tau-extensions#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toxicwind/tau-extensions",
-    "directory": "packages/omp-undo-redo"
+    "url": "git+https://github.com/toxicwind/tau-extensions.git"
   },
   "bugs": {
     "url": "https://github.com/toxicwind/tau-extensions/issues"

@@ -132,13 +132,13 @@ export class SessionNavigation {
     const converted: GitCheckpoint[] = [];
     for (let index = 0; index < this.checkpoints.length; index++) {
       const entry = this.checkpoints[index];
-      if (entry!.kind === "session") continue;
-      converted.push(entry!);
+      if (entry.kind === "session") continue;
+      converted.push(entry);
       this.checkpoints[index] = {
         kind: "session",
         reason: "file_history_gap",
-        parentLeafId: entry!.parentLeafId,
-        leafId: entry!.leafId,
+        parentLeafId: entry.parentLeafId,
+        leafId: entry.leafId,
       };
     }
     return converted;
@@ -210,22 +210,22 @@ export class SessionNavigation {
   private async performUndo(): Promise<NavigationResult> {
     if (this.currentIndex < 0) return { status: "empty" };
     const checkpoint = this.checkpoints[this.currentIndex];
-    if (checkpoint!.kind === "session") {
-      if (!(await this.navigateSession(checkpoint!.parentLeafId))) return { status: "cancelled" };
+    if (checkpoint.kind === "session") {
+      if (!(await this.navigateSession(checkpoint.parentLeafId))) return { status: "cancelled" };
       this.currentIndex--;
       await this.persistState();
-      return this.sessionOnlyResult(checkpoint!);
+      return this.sessionOnlyResult(checkpoint);
     }
 
-    const applied = await this.applyFileCheckpoint(checkpoint!, "before");
+    const applied = await this.applyFileCheckpoint(checkpoint, "before");
     if (applied.status !== "applied") {
       return {
         status: "git_failed",
         failure: applied.status === "conflict" ? "conflict" : "failed",
       };
     }
-    if (!(await this.navigateSession(checkpoint!.parentLeafId))) {
-      const compensated = await this.applyFileCheckpoint(checkpoint!, "after");
+    if (!(await this.navigateSession(checkpoint.parentLeafId))) {
+      const compensated = await this.applyFileCheckpoint(checkpoint, "after");
       if (compensated.status !== "applied") return { status: "rollback_failed" };
       return { status: "cancelled" };
     }
@@ -241,22 +241,22 @@ export class SessionNavigation {
   private async performRedo(): Promise<NavigationResult> {
     if (this.currentIndex >= this.checkpoints.length - 1) return { status: "empty" };
     const checkpoint = this.checkpoints[this.currentIndex + 1];
-    if (checkpoint!.kind === "session") {
-      if (!(await this.navigateSession(checkpoint!.leafId))) return { status: "cancelled" };
+    if (checkpoint.kind === "session") {
+      if (!(await this.navigateSession(checkpoint.leafId))) return { status: "cancelled" };
       this.currentIndex++;
       await this.persistState();
-      return this.sessionOnlyResult(checkpoint!);
+      return this.sessionOnlyResult(checkpoint);
     }
 
-    const applied = await this.applyFileCheckpoint(checkpoint!, "after");
+    const applied = await this.applyFileCheckpoint(checkpoint, "after");
     if (applied.status !== "applied") {
       return {
         status: "git_failed",
         failure: applied.status === "conflict" ? "conflict" : "failed",
       };
     }
-    if (!(await this.navigateSession(checkpoint!.leafId))) {
-      const compensated = await this.applyFileCheckpoint(checkpoint!, "before");
+    if (!(await this.navigateSession(checkpoint.leafId))) {
+      const compensated = await this.applyFileCheckpoint(checkpoint, "before");
       if (compensated.status !== "applied") return { status: "rollback_failed" };
       return { status: "cancelled" };
     }

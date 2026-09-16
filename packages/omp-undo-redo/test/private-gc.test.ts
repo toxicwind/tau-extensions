@@ -155,7 +155,7 @@ describe("private-repo housekeeping", () => {
         // decidable within the test.
         await rmRetry(cwd);
         const [repoEntry] = await readdir(reposDir);
-        const gitDir = join(reposDir, repoEntry!);
+        const gitDir = join(reposDir, repoEntry);
         await backdateRepo(gitDir);
         await pi.emit("session_shutdown", ctx);
         let trash = "";
@@ -254,7 +254,7 @@ describe("private-repo housekeeping", () => {
         await runTurns(pi, ctx, 1, "tracked.txt");
         await rmRetry(cwd);
         const [repoEntry] = await readdir(reposDir);
-        const gitDir = join(reposDir, repoEntry!);
+        const gitDir = join(reposDir, repoEntry);
         await backdateRepo(gitDir);
         await writeFile(join(gitDir, "gc.pid"), "999999\n");
         await pi.emit("session_shutdown", ctx);
@@ -282,7 +282,7 @@ describe("private-repo housekeeping", () => {
         await runTurns(pi, ctx, 1, "tracked.txt");
         await rmRetry(cwd);
         const [repoEntry] = await readdir(reposDir);
-        await backdateRepo(join(reposDir, repoEntry!));
+        await backdateRepo(join(reposDir, repoEntry));
         // The path exists again — but as a file. stat succeeds, so nothing
         // may be read as "gone".
         await writeFile(cwd, "placeholder\n");

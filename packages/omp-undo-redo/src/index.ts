@@ -532,7 +532,7 @@ export default function ompUndoRedo(pi: ExtensionAPI, deps: OmpUndoRedoDependenc
         const config = await readFile(join(path, "config"), "utf8");
         const worktreeMatch = /^\s*worktree\s*=\s*(.+)$/m.exec(config);
         if (!worktreeMatch) continue;
-        const worktree = worktreeMatch[1]!.trim();
+        const worktree = worktreeMatch[1].trim();
         const vanished = async (): Promise<boolean> => {
           try {
             await stat(worktree);

@@ -45,7 +45,7 @@ export async function deleteRefsBatched(
     // Fall through to halving.
   }
   if (refs.length === 1) {
-    return options.onSingleFailure && (await options.onSingleFailure(refs[0]!)) ? "ok" : "failed";
+    return options.onSingleFailure && (await options.onSingleFailure(refs[0])) ? "ok" : "failed";
   }
   const midpoint = Math.ceil(refs.length / 2);
   const left = await deleteRefsBatched(git, refs.slice(0, midpoint), options);

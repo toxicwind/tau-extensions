@@ -167,8 +167,8 @@ export class RuntimeActionStateStore {
     const worker = async (): Promise<void> => {
       while (index < candidates.length) {
         const entry = candidates[index++];
-        if (Number(entry!.name) === this.pid) continue;
-        const dir = join(this.rootDirectory, entry!.name);
+        if (Number(entry.name) === this.pid) continue;
+        const dir = join(this.rootDirectory, entry.name);
         let marker: Partial<RuntimeMarker> = {};
         try {
           marker = JSON.parse(

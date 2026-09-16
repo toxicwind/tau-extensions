@@ -79,9 +79,9 @@ export function parseCheckpointOwnerRef(ref: string): ParsedCheckpointRef | null
   if (parts.slice(0, 3).join("/") !== CHECKPOINT_OWNER_REF_ROOT) return null;
   const [, , , ownerId, sessionHash, checkpointId, phase] = parts;
   if (
-    !isCanonicalUuid(ownerId!) ||
-    !SHA256_PATTERN.test(sessionHash!) ||
-    !isCanonicalUuid(checkpointId!)
+    !isCanonicalUuid(ownerId) ||
+    !SHA256_PATTERN.test(sessionHash) ||
+    !isCanonicalUuid(checkpointId)
   ) {
     return null;
   }
@@ -465,7 +465,7 @@ export class CheckpointOwnerRegistry {
     const worker = async () => {
       while (next < candidates.length) {
         const candidate = candidates[next++];
-        await cleanupStaleOwner(git, repository, candidate!.ownerId, CLEANUP_TIMEOUT_MS);
+        await cleanupStaleOwner(git, repository, candidate.ownerId, CLEANUP_TIMEOUT_MS);
       }
     };
     await Promise.all(

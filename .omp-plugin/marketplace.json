@@ -112,6 +112,23 @@
       "license": "MIT"
     },
     {
+      "name": "omp-best-of",
+      "description": "Best-of-N coding agents with LLM-as-a-verifier selection: runs N candidates in isolated git worktrees, ranks trajectories with a verifier model, and applies only the winning patch.",
+      "version": "0.2.0",
+      "source": "./omp-best-of",
+      "category": "agents",
+      "keywords": [
+        "best-of-n",
+        "verifier",
+        "worktree",
+        "coding-agent",
+        "sampling"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-best-of",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
       "name": "omp-kimi",
       "description": "Drive Moonshot's kimi-code CLI from inside a Tau/omp session: non-interactive prompts, provider/model listing, config validation, and the kimi web UI. Supports KIMI_API_KEY.",
       "version": "0.1.0",
@@ -127,6 +144,32 @@
       "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kimi",
       "repository": "https://github.com/toxicwind/tau-extensions",
       "license": "MIT"
+    },
+    {
+      "name": "gsd-omp",
+      "description": "GSD Embeddable Orchestration System host plugin for Tau: binds the native extension, command, event, task, and filesystem surfaces to GSD via the Host-Integration SDK, with optional Goal Mode status mirroring.",
+      "version": "1.0.24",
+      "source": "./gsd-omp",
+      "category": "orchestration",
+      "keywords": [
+        "gsd",
+        "orchestration",
+        "host-plugin",
+        "goal-mode",
+        "sdk"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/gsd-omp",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-undo-redo",
+      "source": "packages/omp-undo-redo/package.json",
+      "description": "Undo/redo extension vendored from Baylar55/omp-undo-redo. Upstream MIT license retained; entry repointed from absent dist to src.",
+      "metadata": {
+        "pluginRoot": "packages",
+        "origin": "Baylar55/omp-undo-redo"
+      }
     }
   ]
 }
