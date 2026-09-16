@@ -35,3 +35,10 @@ yarn-error.log*
 /engram/
 /semantouch/
 /omp-extensions*
+
+# token-scrub 2026-09-14: never commit secret-shaped files
+*.pat
+github_*_pat.json
+.env*
+*secret*
+*token*
