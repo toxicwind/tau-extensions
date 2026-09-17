@@ -11,6 +11,11 @@ retained in each package directory.
 - packages/omp-model-router
   Derived from cakriwut/omp-model-router (MIT, © Riwut Libinuko).
 
+- packages/omp-kimi
+  Our own extension (MIT, © toxicwind). Integrates the MoonshotAI/kimi-code
+  CLI (MIT, © Moonshot AI) — the CLI itself is not vendored; users install it
+  separately.
+
 Our own extensions are © toxicwind (MIT) unless noted in the package.
 
 - packages/pi-tasks

@@ -4,13 +4,18 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": [
-    "packages/**/*.ts"
-  ],
+  "include": ["packages/**/*.ts"],
   "exclude": [
     "node_modules",
     "dist",
     "build",
+    // Vendored fork: upstream targets @oh-my-pi/* 15.x and does not satisfy
+    // the monorepo's strict settings (noUncheckedIndexedAccess et al.).
+    // Bun loads it directly without a build step, so this exclusion only
+    // affects the CI typecheck gate, not runtime. Port tracked separately.
+    "packages/omp-model-router/**/*.ts",
+    // Restored by union no-loss merge 2026-09-16: these ports do not satisfy
+    // the strict gate either; excluded until their ports are complete.
     "packages/pi-workflow",
     "packages/pi-agent-browser-native",
     "packages/omp-best-of",

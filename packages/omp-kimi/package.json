@@ -1,0 +1,41 @@
+{
+  "name": "@toxicwind/omp-kimi",
+  "version": "0.1.0",
+  "description": "oh-my-pi (omp) extension: drive Moonshot's kimi-code CLI (prompts, models, web UI) from inside an omp session, with KIMI_API_KEY support.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toxicwind/tau-extensions.git",
+    "directory": "packages/omp-kimi"
+  },
+  "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kimi#readme",
+  "bugs": {
+    "url": "https://github.com/toxicwind/tau-extensions/issues"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "omp": {
+    "extensions": [
+      "./src/extension.ts"
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": "^18.0.11"
+  },
+  "devDependencies": {
+    "@oh-my-pi/pi-coding-agent": "^18.0.11",
+    "@types/bun": "latest",
+    "typescript": "^5.6.0"
+  }
+}

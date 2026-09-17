@@ -2,28 +2,36 @@
 
 [`toxicwind/tau-extensions`](https://github.com/toxicwind/tau-extensions) — a monorepo of Tau extensions.
 
-Ten extensions that plug directly into your Tau (oh-my-pi / `omp`) agent session: two built here, eight vendored forks of community extensions — all MIT-licensed, all cataloged under the `tau-extensions` marketplace.
+A curated set of Tau extensions that plug directly into your Tau agent session. Five extensions ship out of the box:
+
+- **omp-kafka** — subscribe to Apache Kafka topics and surface messages in the session (auto push or on-demand pull).
+- **omp-edit-committer** — auto-commit every Edit/Write with a descriptive Conventional-Commits message and surface the SHA under the tool result.
+- **omp-model-router** — cost-optimized model routing: sends prompts to cheap/mid/expensive models by task complexity; tracks per-turn and session costs.
+- **omp-kimi** — drive Moonshot's kimi-code CLI from the session: non-interactive prompts, provider/model listing, config validation, and the kimi web UI (supports `KIMI_API_KEY`).
+- **pi-tasks** — task tracking and coordination: structured multi-step tasks, dependency management, background task processes, and a persistent visual task widget.
+
+```mermaid
+flowchart LR
+    subgraph omp[omp session]
+        ext1[omp-kafka]
+        ext2[omp-edit-committer]
+    end
+    Kafka((Kafka)) --> ext1
+    Agent --> ext1
+    Agent --> ext2
+    Git[(Git)] --> ext2
+end
+```
 
 ## Extensions
 
-| Extension | Category | What it does | Provenance |
-|---|---|---|---|
-| [`omp-kafka`](packages/omp-kafka) | Integration | Consume Kafka topics into a session; auto (push) and pull modes with `/kafka-*` slash commands and a `kafka_consume` LLM tool. | Built here (from RekunDzmitry/omp-extensions) |
-| [`omp-edit-committer`](packages/omp-edit-committer) | Workflow | Auto-commit every Edit/Write with a Conventional-Commits message; renders a commit badge next to the tool result (works with `modem-dev/hunk`). | Built here (from RekunDzmitry/omp-extensions) |
-| [`omp-model-router`](packages/omp-model-router) | Model routing | Route prompts to cheap/mid/expensive models by task complexity; tracks per-turn and session costs. | Fork of cakriwut/omp-model-router |
-| [`engram`](packages/engram) | Memory | Persistent memory for the agent session. | Vendored from thebtf/engram (locally adapted) |
-| [`gsd-omp`](packages/gsd-omp) | Orchestration | GSD Embeddable Orchestration System host plugin for Tau. | Fork of tchivs/gsd-omp |
-| [`omp-best-of`](packages/omp-best-of) | Agents | Best-of-N coding agents with LLM-as-a-verifier selection. | Fork of wolfiesch/omp-best-of |
-| [`omp-undo-redo`](packages/omp-undo-redo) | Workflow | Session and file undo/redo; snapshot-based undo of agent edits. | Fork of Baylar55/omp-undo-redo |
-| [`pi-agent-browser-native`](packages/pi-agent-browser-native) | Automation | Exposes agent-browser as a native Tau tool for scripted browser automation. | Fork of fitchmultz/pi-agent-browser-native |
-| [`pi-tasks`](packages/pi-tasks) | Productivity | Claude Code-style task tracking and coordination. | Fork of tintinweb/pi-tasks |
-| [`pi-workflow`](packages/pi-workflow) | Workflow | Named, repeatable multi-step workflow orchestration. | Fork of AgwaB/pi-workflow |
-
-Fork provenance and attribution live in [`NOTICE`](./NOTICE). Forks keep their upstream LICENSE files; repo URLs are repointed at this monorepo.
-
-## Marketplace
-
-`marketplace.json` (repo root) is the plugin catalog: `tau-extensions` by `toxicwind`, `pluginRoot: packages`, 10 plugins. The Tau engine reads `.omp-plugin/marketplace.json` first — the two manifests are kept byte-identical.
+| Extension | Category | What it does |
+|---|---|---|
+| [`omp-kafka`](packages/omp-kafka) | Integration | Consume Kafka topics into an `omp` session; supports auto (push) and pull modes with `/kafka-*` slash commands and a `kafka_consume` LLM tool. |
+| [`omp-edit-committer`](packages/omp-edit-committer) | Workflow | Auto-commit every Edit/Write with intent, trade-offs, and an ASCII diagram; renders a commit badge next to the tool result for use with `modem-dev/hunk`. |
+| [`omp-model-router`](packages/omp-model-router) | Model routing | Cost-optimized model routing for Tau/omp — routes prompts to cheap/mid/expensive models based on task complexity; tracks per-turn and session costs. |
+| [`omp-kimi`](packages/omp-kimi) | Integration | Drive Moonshot's kimi-code CLI from the session: `/kimi` non-interactive prompts, `/kimi-models`, `/kimi-doctor`, `/kimi-web` (web UI), plus a `kimi_ask` LLM tool. |
+| [`pi-tasks`](packages/pi-tasks) | Productivity | Task tracking and coordination: structured multi-step tasks, dependency management, background task processes, and a persistent visual task widget. |
 
 ## Install
 

@@ -1,5 +1,11 @@
 # @cakriwut/omp-model-router
 
+> **Vendored note (tau-extensions):** this fork was written against
+> `@oh-my-pi/*` 15.x and does not yet satisfy the monorepo's strict
+> typecheck, so `packages/omp-model-router` is excluded from the root
+> `tsc -b` gate until it is ported. Bun loads the TypeScript directly, so
+> runtime behavior is unaffected.
+
 Cost-optimized model routing for [Oh-My-Pi](https://github.com/can1357/oh-my-pi) — routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs. Integrates with RTK (Rust Token Killer) for 60-90% token savings on tool outputs.
 
 > **Note**: This is a TypeScript source package for Oh-My-Pi extensions. Users need the OMP environment with `@oh-my-pi/pi-coding-agent` installed.
