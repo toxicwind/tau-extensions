@@ -1,0 +1,62 @@
+{
+  "name": "tau-flocksync",
+  "version": "1.0.0",
+  "description": "flocksync / OmniRoute model router sync extension for Tau and sovereign agents",
+  "keywords": [
+    "tau-plugin",
+    "tau-extension",
+    "flocksync",
+    "omniroute",
+    "llm",
+    "ai-gateway",
+    "extension"
+  ],
+  "type": "module",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "tau": {
+    "extensions": [
+      "./src/tau.ts"
+    ]
+  },
+  "omp": {
+    "extensions": [
+      "./src/tau.ts"
+    ]
+  },
+  "pi": {
+    "extensions": [
+      "./src/tau.ts"
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "release": "node ./node_modules/semantic-release/bin/semantic-release.js"
+  },
+  "author": "toxicwind",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toxicwind/tau-extensions.git"
+  },
+  "homepage": "https://github.com/toxicwind/tau-extensions",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "peerDependencies": {
+    "tau": "*",
+    "@oh-my-pi/pi-tui": "*"
+  },
+  "devDependencies": {
+    "tau": "^18.0.0",
+    "@oh-my-pi/pi-tui": "^18.0.0",
+    "@types/node": "^25.9.5",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.11"
+  }
+}

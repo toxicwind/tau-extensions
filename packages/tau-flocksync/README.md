@@ -1,0 +1,501 @@
+# tau-flocksync
+
+OmniRoute & flocksync model router sync extension for [Tau](https://github.com/toxicwind/tau) and sovereign coding agents.
+
+## What You Get
+
+- Sovereign first-class support for `tau` with `tau-natives` and `.tau/agent`.
+- Backwards-compatible support for `omp` and `pi`.
+- Dual-command interface: `/flocksync` and legacy `/omni`.
+- Dual-tool interfaces: `flocksync_status`, `flocksync_sync`, and legacy `omniroute_status`, `omniroute_sync`.
+- Auto-discovery of local flocksync (`:25193`) and OmniRoute (`:20130`).
+- A polished, tabbed `/omni config` overlay.
+- Stable session affinity and prompt-cache reuse through OmniRoute's `x-session-id` header.
+- Models in the standard `/model` picker.
+- Strict filtering based on active OmniRoute provider connections when management endpoints are available.
+- Catalog metadata for context windows, output limits, vision, tool calling, and reasoning effort tiers.
+- Optional include and exclude model globs.
+- Optional global `auto` and `auto/*` routing models.
+- Real cost metadata from OmniRoute's pricing API, with zero-cost fallback when pricing is unavailable.
+- Background catalog autosync while a session is running, configurable from `/omni config` or `/omni autosync`.
+- Secure extension-owned settings; API keys are never copied to `models.json`.
+- Health status, model browsing, and direct model testing commands. Health checks use OmniRoute's lightweight `/api/health/ping` endpoint instead of downloading the full model catalog.
+
+## Requirements
+
+You need:
+
+- A running flocksync (`http://127.0.0.1:25193`) or OmniRoute (`http://127.0.0.1:20130`) server.
+- If authentication is enabled, an inference API key with `manage` or `admin` scope.
+- Tau (`tau`), Oh My Pi (`omp`), or Pi Coding Agent (`pi`).
+## Installation
+
+### Tau Coding Agent
+
+Configured natively in `~/.tau/agent/config.yml` or installed via `@toxicwind/tau-extensions`:
+
+```yaml
+extensions:
+  - tau-flocksync
+```
+
+Or drop into `~/.tau/extensions/flocksync.ts`:
+
+```ts
+export { default } from "./tau-flocksync/tau.ts";
+```
+## Quick Start
+
+1. Start `pi` or `omp`.
+2. Run:
+
+   ```text
+   /omni setup
+   ```
+
+   http://127.0.0.1:20130
+   ```
+
+   Or for flocksync:
+
+   ```text
+   http://127.0.0.1:25193
+
+   You may enter a URL ending in `/v1`; the extension normalizes it to the server base URL.
+
+4. Enter an OmniRoute inference API key, or leave it empty if your server does not require authentication. Management scope is optional; it enables stricter provider filtering and pricing lookup.
+5. Open the normal model picker:
+
+   ```text
+   /model
+   ```
+
+6. Select an OmniRoute-backed model and chat normally.
+
+You can rerun `/omni setup` whenever the server URL or API key changes. Pressing Enter at the API-key prompt preserves an existing key.
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `/omni` | Shows the server URL, provider name, reachability, and whether a settings file exists. |
+| `/omni setup` | Prompts for the server URL and API key, verifies `/v1/models`, saves the settings, and synchronizes models. |
+| `/omni sync` | Performs a strict model discovery, registers the provider, updates `models.json`, and records a successful-sync timestamp. |
+| `/omni models` | Discovers and lists available models grouped by provider prefix. |
+| `/omni models <search>` | Lists models whose ID or display name contains the search text. |
+| `/omni test <model-id>` | Sends a small non-streaming request through the configured inference API (`/v1/responses` in Pi or `/v1/chat/completions` in OMP) and displays the result. |
+| `/omni dashboard` | Displays the configured OmniRoute base URL. `/omni dash` is also accepted. |
+| `/omni config` | Opens the Summary and Config overlay in TUI mode, including the autosync interval and gateway tok/s display toggle. |
+| `/omni autosync [status\|on\|off\|<seconds>]` | Shows or changes the background catalog refresh interval in seconds. `0`/`off` disables it; the default is 300 seconds (5 minutes). |
+| `/omni help` | Displays the built-in command summary. |
+
+Examples:
+
+```text
+/omni models gemini
+/omni test openai/gpt-5
+/omni sync
+/omni autosync 300
+```
+
+Autosync runs only while the host session is active. It refreshes the catalog in the background, keeps the last successful catalog when a refresh fails, and stops when the session shuts down. The interval is also editable as **Auto-sync interval** in the `/omni config` dialog; enter seconds, or `0` to disable it.
+
+
+## Settings
+
+| Host | Settings file |
+|---|---|
+| Pi | `~/.pi/agent/extensions/pi-omniroute-sync/settings.json` |
+| OMP | `~/.omp/agent/extensions/pi-omniroute-sync/settings.json` |
+
+Default settings:
+
+```json
+{
+  "serverUrl": "http://localhost:20128",
+  "providerName": "omni",
+  "onlyShowUsableModels": true,
+  "showGlobalRoutingModels": true,
+  "includeModels": [],
+  "excludeModels": [],
+  "syncOnStartup": true,
+  "modelCacheTtlMinutes": 60,
+  "autoSyncIntervalSeconds": 300,
+  "showGatewayTokensPerSecond": false,
+  "lastSuccessfulSyncAt": 0,
+  "onUnreachable": "none",
+  "fallbackModel": "",
+  "apiKey": ""
+}
+```
+
+### Settings reference
+
+| Setting | Type | Default | Behavior |
+|---|---|---:|---|
+| `serverUrl` | string | `http://localhost:20128` | OmniRoute base URL. Trailing slashes and a trailing `/v1` are removed. |
+| `providerName` | string | `omni` | Provider key registered in the host and stored in `models.json`. Keep this as `omni` for normal operation. |
+| `onlyShowUsableModels` | boolean | `true` | Shows namespaced catalog models only when their provider has a usable OmniRoute connection. |
+| `showGlobalRoutingModels` | boolean | `true` | Controls all IDs equal to `auto` or beginning with `auto/`. |
+| `includeModels` | string[] | `[]` | If non-empty, advertised catalog models must match at least one pattern. |
+| `excludeModels` | string[] | `[]` | Advertised catalog models matching any pattern are hidden. Excludes win over includes. |
+| `syncOnStartup` | boolean | `true` | Performs at most one model synchronization during session startup when the cache is stale. |
+| `modelCacheTtlMinutes` | number | `60` | Number of minutes before the last successful sync is stale. Must be non-negative; `0` means always stale. |
+| `autoSyncIntervalSeconds` | number | `300` | Background catalog refresh interval in seconds while a session is running. Configure it in `/omni config` or `/omni autosync`; `0` disables autosync. |
+| `showGatewayTokensPerSecond` | boolean | `false` | Displays gateway-reported tok/s after OmniRoute turns when enabled. Configure it in `/omni config`; disabling it does not affect inference requests. |
+| `lastSuccessfulSyncAt` | number | `0` | Unix timestamp in milliseconds maintained automatically after successful syncs. `0` means no successful sync has been recorded. |
+| `onUnreachable` | `"none"` \| `"host-fallback"` | `none` | When `host-fallback`, probe the configured `serverUrl` before send and hop to `fallbackModel` if the gateway is down or times out. Configure it in `/omni config`. |
+| `fallbackModel` | string | empty | Authenticated host `provider/id` for the on-unreachable hop, for example `anthropic/claude-sonnet-4`. Empty means notify only. Configure it in `/omni config`. |
+| `apiKey` | string | empty | Bearer token sent to OmniRoute. Stored only in the protected extension settings file. |
+
+
+Note: OmniRoute's `/v1/models` response can include models from providers that have no configured credentials or active connection. The default `onlyShowUsableModels: true` hides those catalog-only models when `/api/providers` is available. If provider verification is unavailable (for example, an inference-only key receives `403`), synchronization fails open and keeps the advertised catalog visible.
+
+Models explicitly marked `enabled: false` are also hidden while usable-only filtering is enabled.
+
+Set `onlyShowUsableModels` to `false` only when you intentionally want OmniRoute's full advertised model catalog.
+
+## Model Glob Filtering
+
+`includeModels` and `excludeModels` provide dependency-free filtering of advertised model IDs.
+
+Supported tokens:
+
+- `*` matches zero or more characters.
+- `?` matches exactly one character.
+- Every other character is matched literally.
+- Matching is case-sensitive and applies to the complete model ID.
+
+Example:
+
+```json
+{
+  "includeModels": [
+    "openai/*",
+    "google/gemini-?"
+  ],
+  "excludeModels": [
+    "*/deprecated-*",
+    "openai/legacy-*"
+  ]
+}
+```
+
+This configuration:
+
+- Allows all `openai/` IDs.
+- Allows IDs such as `google/gemini-2`.
+- Does not match `google/gemini-2.5` through the single `?` token.
+- Removes matching deprecated or legacy IDs even when an include pattern matched.
+
+For advertised catalog models, filters apply in this order:
+
+1. Global routing visibility.
+2. Usable-provider verification.
+3. Include patterns, when the include list is non-empty.
+4. Exclude patterns.
+
+Synthetic global routing models added by the extension are controlled by `showGlobalRoutingModels`; include and exclude globs apply to models advertised by OmniRoute.
+
+In `/omni config`, enter patterns as a comma-separated list. The extension stores them as JSON arrays.
+
+## Global Routing Models
+
+When `showGlobalRoutingModels` is enabled, the extension ensures these OmniRoute routing IDs are available:
+
+```text
+auto
+auto/coding
+auto/fast
+auto/cheap
+auto/offline
+auto/smart
+auto/lkgp
+auto/best-chaos
+auto/best-chat
+auto/best-coding
+```
+
+If OmniRoute already advertises one of these IDs, the extension does not add a duplicate. OmniRoute resolves the selected route server-side.
+
+Set:
+
+```json
+{
+  "showGlobalRoutingModels": false
+}
+```
+
+to hide `auto`, every current `auto/*` ID, and future advertised IDs in the same namespace. Ordinary IDs such as `openai/auto` are not treated as global routes.
+
+Synthetic global models use zero cost metadata because they can route to different underlying models.
+
+## Pricing
+
+Every synchronization fetches model pricing from:
+
+```text
+GET /api/pricing
+```
+
+OmniRoute prices are interpreted directly as USD per million tokens and mapped to Pi's model metadata:
+
+| OmniRoute field | Pi cost field |
+|---|---|
+| `input` | `cost.input` |
+| `output` | `cost.output` |
+| `cached`, then `cacheRead` | `cost.cacheRead` |
+| `cache_creation`, then `cacheWrite` | `cost.cacheWrite` |
+
+Missing values default to `0`. Every model receives complete cost metadata, including `tiers: []`, so Pi can safely consume both newly synchronized and older persisted model records.
+
+A failure to fetch or parse `/api/pricing` falls back to zero-cost metadata; it does not abort synchronization or replace the existing provider with an incomplete result.
+
+## Gateway Telemetry
+
+When an OmniRoute-backed agent turn settles, the extension displays the gateway-reported generation speed as `tok/s N.N`. It reads `X-OmniRoute-Tokens-Per-Second` and the final stream metadata or usage field, including streamed SSE responses. If OmniRoute does not provide a value, it displays `tok/s —`.
+
+The extension never derives tok/s from token counts and `X-OmniRoute-Latency-Ms`; latency includes time that is not generation. Telemetry is scoped to OmniRoute inference requests and is not shown for other providers. The display is disabled by default and can be enabled with **Show gateway tok/s** in `/omni config`.
+
+## Catalog Metadata
+
+Each synchronization maps OmniRoute `/v1/models` metadata onto the host model catalog:
+
+| OmniRoute metadata | Pi/OMP model metadata |
+|---|---|
+| `context_length` or `max_input_tokens` | `contextWindow` |
+| `max_output_tokens` or `max_tokens` | `maxTokens` |
+| Missing output limit | Omits the output-token field on the wire through the host compatibility hook |
+| `input_modalities` and `capabilities.vision`, `attachment`, `pdf`, or `video` | `input: ["text", "image"]` |
+| `capabilities.tool_calling` | `supportsTools` |
+| `effort_tiers` (top-level or under `capabilities`) | Reasoning effort controls |
+
+Audio, video, and PDF remain gateway capabilities because Pi and OMP only accept `text` and `image` as stored input kinds. Vision-capable models are advertised as accepting `image` input.
+
+Pi uses the Responses API by default. The OMP adapter uses OpenAI Chat Completions and preserves the same normal `/model <model-id>` workflow.
+
+## Environment Overrides
+
+Runtime configuration can be overridden with environment variables:
+
+| Variable | Overrides |
+|---|---|
+| `OMNIROUTE_URL` | `serverUrl` (runtime provider registration only; health/hop probes still use the configured settings `serverUrl` after `/omni setup`) |
+| `OMNIROUTE_API_KEY` | `apiKey` |
+| `OMNIROUTE_PROVIDER_NAME` | `providerName` |
+| `OMNIROUTE_ON_UNREACHABLE` | `onUnreachable` |
+| `OMNIROUTE_FALLBACK_MODEL` | `fallbackModel` |
+
+Example:
+
+```bash
+OMNIROUTE_URL=https://omniroute.example.com \
+OMNIROUTE_API_KEY=secret \
+pi
+```
+
+Environment values take precedence when the extension loads runtime configuration. They are not written back to the private settings file or `models.json`. Health and on-unreachable probes use the configured settings `serverUrl` after `/omni setup`, not only `OMNIROUTE_URL`.
+
+## Unreachable hop and host fallback
+
+Catalog sync and the footer health status do not switch the active model by themselves. When OmniRoute is down or timing out, the next send still goes to `omni` unless you hop.
+
+This package does **not** register a second OmniRoute provider. The Pi and OMP adapters use the host model registry and `setModel` API; manual switching stays:
+
+```text
+/model <model-id>
+```
+
+Optional settings automate that host switch:
+
+```json
+{
+  "onUnreachable": "host-fallback",
+  "fallbackModel": "anthropic/claude-sonnet-4"
+}
+```
+
+Behavior:
+
+1. Before the first request (`before_agent_start`) and each subsequent inference turn (`turn_start`), probe the configured `serverUrl` with `/api/health/ping`.
+2. Connect failures, timeouts, and HTTP 408/5xx responses are unreachable. Other HTTP responses (for example, 401 or 429) indicate a reachable gateway and do not trigger a host hop.
+3. After the failed turn settles, if the active model is still `omni` and `onUnreachable` is `host-fallback`, call the host `setModel` API for `fallbackModel`.
+4. If the host provider is not authenticated, the extension notifies and leaves the current model unchanged. Use `/model anthropic/claude-sonnet-4` (or another already-logged-in host model) manually.
+
+`onUnreachable: "none"` (the default) keeps today's status-only behavior. In `/omni config`, toggle **On unreachable** between `none` and `host-fallback`, then edit **Fallback model**. Leave the model empty to receive a warning without switching. The fallback must be a different host provider; `omni/...` is ignored.
+
+For normal startup synchronization and complete configuration management, run `/omni setup` once so the extension-owned settings file exists. You can then keep secrets in environment variables if preferred.
+
+## Files and Security
+
+### Pi
+
+| Path | Purpose |
+|---|---|
+| `~/.pi/agent/extensions/pi-omniroute-sync/settings.json` | All extension configuration, the API key, and the last successful sync timestamp. |
+| `~/.pi/agent/models.json` | Persisted provider metadata and synchronized models. |
+
+### Oh My Pi
+
+| Path | Purpose |
+|---|---|
+| `~/.omp/agent/extensions/pi-omniroute-sync/settings.json` | All extension configuration, the API key, and the last successful sync timestamp. |
+| `~/.omp/agent/models.json` | Persisted provider metadata and synchronized models. |
+
+`settings.json` is the extension's only state/configuration file. The API key is used at runtime when registering the provider but is deliberately omitted from `models.json`. The persisted OmniRoute provider is marked `auth: "none"` so OMP can validate its custom model catalog before the extension restores the protected key at runtime. Other providers already present in `models.json` are preserved when OmniRoute synchronizes.
+
+Treat `settings.json` as a secret. Do not commit it or copy it into a repository.
+
+## Agent-Callable Tools
+
+The extension registers two tools that the active model may call:
+
+### `omniroute_status`
+
+Checks server reachability and reports:
+
+- Whether OmniRoute is reachable.
+- Whether the extension settings file exists.
+- The server URL.
+- The registered provider name.
+- The effective `onUnreachable` action and `fallbackModel`.
+
+### `omniroute_sync`
+
+Performs the same strict discovery and provider update as `/omni sync`, then reports the synchronized model count and provider name.
+
+Both tools honor cancellation from the host. Network requests combine host cancellation with bounded request timeouts.
+
+## Troubleshooting
+
+### OMP reports `Provider omni` during startup
+
+Only enable one OmniRoute extension at a time. `pi-omniroute-sync` and `omniroute-agent-extension` both register the provider name `omni`; enabling both can cause startup validation errors. Disable or uninstall the older extension:
+
+```bash
+omp plugin disable omniroute-agent-extension
+```
+
+### The extension says OmniRoute is unconfigured
+
+Run:
+
+```text
+/omni setup
+```
+
+If you configure only through environment variables, make sure `OMNIROUTE_URL` is present in the environment that launched Pi or OMP.
+
+### Setup cannot reach `/v1/models`
+
+Verify that:
+
+- OmniRoute is running.
+- `serverUrl` points to the server root, not an unrelated proxy path.
+- The API key is valid if authentication is required.
+- Pi or OMP can reach the host and port.
+
+Then check:
+
+```text
+/omni
+```
+
+The footer health status uses OmniRoute's lightweight `/api/health/ping` endpoint, while `/v1/models` is reserved for synchronization. The same ping is used for on-unreachable probes against the configured `serverUrl`.
+
+If the gateway stays down and you have another host provider authenticated, either run `/model <provider/id>` or open `/omni config` and set **On unreachable** to `host-fallback` with an authenticated **Fallback model**. A connection or timeout error is detected after the failed turn as well as by the pre-send liveness probe.
+
+### A provider's models are missing
+
+With `onlyShowUsableModels: true`, confirm in OmniRoute that the provider connection:
+
+- Is active.
+- Has no failed test status.
+- Uses its configured custom provider prefix (`providerSpecificData.prefix`), `displayPrefix`, or has an alias mapping in `/api/pricing/models` when its catalog prefix differs from its canonical provider name.
+
+If the key cannot access `/api/providers` or `/api/pricing/models`, the extension fails open and shows the advertised catalog instead of hiding every namespaced model. Pricing will be zero until a later successful sync.
+
+Also inspect `includeModels` and `excludeModels`. Exclude patterns always win.
+
+Use:
+
+```text
+/omni models <provider-or-model>
+```
+
+to inspect the currently discoverable set.
+
+### `auto/*` routes are missing
+
+Open `/omni config` and enable **Show global routing models**, or set:
+
+```json
+{
+  "showGlobalRoutingModels": true
+}
+```
+
+### Changes in `/omni config` disappeared
+
+- Escape inside a text editor cancels only that field edit.
+- Escape outside editing saves the draft and synchronizes.
+- Ctrl+C intentionally discards the entire draft.
+
+### A source edit is not reflected
+
+If the extension is installed from a linked local package, run:
+
+```text
+/reload
+```
+
+For a direct one-off Pi load during development:
+
+```bash
+pi -e /path/to/pi-omniroute-sync/src/pi.ts
+```
+
+## Development
+
+Install dependencies:
+
+```bash
+bun install
+```
+
+Validate changes:
+
+```bash
+bun run typecheck
+bun run test
+```
+
+The release workflow runs semantic-release with Node.js 24.10.0 or newer because current semantic-release versions do not support Bun's Node compatibility runtime.
+
+The test suite imports both Pi and OMP package entry points and covers their host-specific adapters, secure configuration, model normalization, strict provider filtering, provider aliases, global route filtering, glob matching, pricing mapping, startup staleness, staged dialog behavior, native input handling, save/discard semantics, configured-URL health probes, request-failure detection, and optional on-unreachable host fallback. This unit coverage replaces a separate import-only smoke script.
+
+Package entry points:
+
+| Host | Entry point |
+|---|---|
+| Pi | `src/pi.ts` |
+| OMP | `src/omp.ts` |
+
+The OMP adapter uses the `@earendil-works/pi-tui` compatibility scope so OMP can resolve its TUI imports through the host's built-in legacy package shim. This keeps the package compatible with OMP's isolated plugin installation without adding a duplicate TUI dependency.
+
+Core implementation:
+
+| File | Responsibility |
+|---|---|
+| `src/extension.ts` | Lifecycle hooks, commands, agent tools, setup, status, and dialog orchestration. |
+| `src/provider.ts` | HTTP requests, discovery, filtering, pricing, provider registration, persistence, and startup staleness. |
+| `src/unreachable.ts` | Configured-URL probe cache and optional host-fallback hop. |
+| `src/config-dialog.ts` | Staged tabbed overlay and host-native inline editing. |
+| `src/config.ts` | Defaults, environment overrides, paths, normalization, and secure settings persistence. |
+| `src/contracts.ts` | Minimal host-neutral contracts used by both adapters. |
+| `src/pi.ts` | Pi adapter and native Pi TUI injection. |
+| `src/omp.ts` | OMP adapter and native OMP TUI injection. |
+
+## License
+
+[MIT](LICENSE)

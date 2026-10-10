@@ -1,0 +1,58 @@
+{
+  "name": "@toxicwind/rawhide",
+  "version": "1.0.0",
+  "description": "Untanned, unvarnished, slop-free prose linter and style engine for the Ranch. Eliminates AI boilerplate, timid hedging, and corporate fluff while honoring natural technical syntax and Gwernian epistemic depth.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test tests/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "oh-my-pi",
+    "omp",
+    "tau",
+    "rawhide",
+    "prose-linter",
+    "anti-slop",
+    "gwern",
+    "epistemic",
+    "technical-writing"
+  ],
+  "author": "ToxicWind <toxic@awrawr-pc>",
+  "contributors": [
+    "Gwern Branwen (Gwern.net Manual of Style)",
+    "Rami (donrami/airspeak upstream lineage)",
+    "Kesselman (Verbal Probability Expressions in NIE)"
+  ],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "tau": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.5",
+    "typescript": "^5.9.3"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "omp": {
+    "repository": "https://github.com/toxicwind/tau-extensions",
+    "type": "extension",
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}

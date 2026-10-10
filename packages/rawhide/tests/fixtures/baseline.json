@@ -1,0 +1,64 @@
+{
+  "en": {
+    "sentence-length": {
+      "violating": [
+        "[STE 6.3] sentence has 27 words (cap 25): \"This sentence is deliberately very long so that the word cou...\""
+      ],
+      "conforming": []
+    },
+    "semicolon": {
+      "violating": [
+        "[STE 8.1] 1 semicolon(s) in prose — STE bans semicolons. Replace with period or split."
+      ],
+      "conforming": []
+    },
+    "nominalization": {
+      "violating": [
+        "[STE 3.7] nominalization — use a verb: \"perform an analysis\""
+      ],
+      "conforming": []
+    },
+    "phrasal-verb": {
+      "violating": [
+        "[STE 9.3] phrasal verb \"spin up\" — replace with \"start\"."
+      ],
+      "conforming": []
+    },
+    "banned": {
+      "violating": [
+        "[anti-slop] banned \"seamless\" — cut or replace with a concrete spec."
+      ],
+      "conforming": []
+    },
+    "em-dash": {
+      "violating": [
+        "[style] 2 em-dashes in a 31-word paragraph — keep at most 1."
+      ],
+      "conforming": []
+    },
+    "contraction": {
+      "violating": [
+        "[STE 4.2] contraction \"can't\" — write \"cannot\"."
+      ],
+      "conforming": []
+    },
+    "missing-that": {
+      "violating": [
+        "[GR-1] add \"that\": \"make sure that …\"."
+      ],
+      "conforming": []
+    },
+    "latin-abbrev": {
+      "violating": [
+        "[GR-6] Latin abbreviation \"e.g.\" — use \"for example\"."
+      ],
+      "conforming": []
+    },
+    "gendered-pronoun": {
+      "violating": [
+        "[GR-7] gendered term \"he\" — use \"they\" or rephrase."
+      ],
+      "conforming": []
+    }
+  }
+}

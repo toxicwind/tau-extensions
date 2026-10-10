@@ -1,0 +1,192 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "tau-extensions",
+  "owner": {
+    "name": "toxicwind",
+    "email": "toxicwind@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "Tau extensions by toxicwind",
+    "version": "0.2.0",
+    "pluginRoot": "packages"
+  },
+  "plugins": [
+    {
+      "name": "omp-kafka",
+      "description": "Consume Kafka topics into a Tau/omp session in auto (push) or pull mode.",
+      "version": "0.2.0",
+      "source": "./omp-kafka",
+      "category": "integration",
+      "keywords": [
+        "kafka",
+        "streaming",
+        "events",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kafka",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-edit-committer",
+      "description": "Auto-commit every Edit/Write with a descriptive message and surface the SHA in the TUI.",
+      "version": "0.2.0",
+      "source": "./omp-edit-committer",
+      "category": "workflow",
+      "keywords": [
+        "git",
+        "commits",
+        "hunk",
+        "review",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-edit-committer",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-model-router",
+      "description": "Cost-optimized model routing for Tau/omp — routes prompts to cheap/mid/expensive models based on task complexity. Tracks per-turn and session costs.",
+      "version": "0.8.9",
+      "source": "./omp-model-router",
+      "category": "model-routing",
+      "keywords": [
+        "model-router",
+        "cost-optimization",
+        "routing",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-model-router",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "pi-tasks",
+      "description": "Claude Code-style task tracking and coordination: structured multi-step tasks, dependency management, background task processes, and a persistent visual task widget.",
+      "version": "0.9.0",
+      "source": "./pi-tasks",
+      "category": "productivity",
+      "keywords": [
+        "tasks",
+        "tracking",
+        "coordination",
+        "background-tasks",
+        "widget"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-tasks",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "pi-workflow",
+      "description": "Workflow orchestration for Tau: named, repeatable multi-step workflows (research, code review, spec checks) coordinating subagent workers across steps, with run inspection, stop, and resume.",
+      "version": "0.13.8",
+      "source": "./pi-workflow",
+      "category": "workflow",
+      "keywords": [
+        "workflow",
+        "orchestration",
+        "subagents",
+        "automation",
+        "pipeline"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-workflow",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "pi-agent-browser-native",
+      "description": "Expose agent-browser as a native Tau tool: scripted browser automation (navigate, snapshot, act, extract) with session management, batch lifecycle, and hardened command policies.",
+      "version": "0.6.12",
+      "source": "./pi-agent-browser-native",
+      "category": "automation",
+      "keywords": [
+        "browser",
+        "automation",
+        "agent-browser",
+        "web",
+        "scraping"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/pi-agent-browser-native",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-best-of",
+      "description": "Best-of-N coding agents with LLM-as-a-verifier selection: runs N candidates in isolated git worktrees, ranks trajectories with a verifier model, and applies only the winning patch.",
+      "version": "0.2.0",
+      "source": "./omp-best-of",
+      "category": "agents",
+      "keywords": [
+        "best-of-n",
+        "verifier",
+        "worktree",
+        "coding-agent",
+        "sampling"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-best-of",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-kimi",
+      "description": "Drive Moonshot's kimi-code CLI from inside a Tau/omp session: non-interactive prompts, provider/model listing, config validation, and the kimi web UI. Supports KIMI_API_KEY.",
+      "version": "0.1.0",
+      "source": "./omp-kimi",
+      "category": "integration",
+      "keywords": [
+        "kimi",
+        "kimi-code",
+        "moonshot",
+        "agent",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/omp-kimi",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "gsd-omp",
+      "description": "GSD Embeddable Orchestration System host plugin for Tau: binds the native extension, command, event, task, and filesystem surfaces to GSD via the Host-Integration SDK, with optional Goal Mode status mirroring.",
+      "version": "1.0.24",
+      "source": "./gsd-omp",
+      "category": "orchestration",
+      "keywords": [
+        "gsd",
+        "orchestration",
+        "host-plugin",
+        "goal-mode",
+        "sdk"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/gsd-omp",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    },
+    {
+      "name": "omp-undo-redo",
+      "source": "packages/omp-undo-redo/package.json",
+      "description": "Undo/redo extension vendored from Baylar55/omp-undo-redo. Upstream MIT license retained; entry repointed from absent dist to src.",
+      "metadata": {
+        "pluginRoot": "packages",
+        "origin": "Baylar55/omp-undo-redo"
+      }
+    },
+    {
+      "name": "tau-flocksync",
+      "description": "flocksync / OmniRoute model router sync extension for Tau and sovereign agents.",
+      "version": "1.0.0",
+      "source": "./tau-flocksync",
+      "category": "model-routing",
+      "keywords": [
+        "flocksync",
+        "omniroute",
+        "model-sync",
+        "routing",
+        "extension"
+      ],
+      "homepage": "https://github.com/toxicwind/tau-extensions/tree/main/packages/tau-flocksync",
+      "repository": "https://github.com/toxicwind/tau-extensions",
+      "license": "MIT"
+    }
+  ]
+}
