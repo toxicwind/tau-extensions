@@ -31,7 +31,7 @@ import type {
 	ExtensionContext,
 	WriteToolCallEvent,
 	WriteToolResultEvent,
-} from "tau";
+} from "@tau/tau-agent";
 import {
 	type RepoProbe,
 	commitPaths,

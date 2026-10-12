@@ -6,7 +6,7 @@ import {
 	replaceTabs,
 	truncateToWidth,
 } from "@oh-my-pi/pi-tui";
-import type { Theme, KeybindingsManager } from "tau";
+import type { Theme, KeybindingsManager } from "@tau/tau-agent";
 import type { PromptLogRecord } from "../calibration/trace";
 
 // ─── Session entry (for picker) ───────────────────────────────────────────────

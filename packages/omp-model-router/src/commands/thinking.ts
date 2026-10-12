@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import type { RouterState } from "../state";
 import type { RouterTier } from "../types";

@@ -17,7 +17,7 @@
     "README.md",
     "LICENSE"
   ],
-  "tau": {
+  "@tau/tau-agent": {
     "extensions": [
       "./src/tau.ts"
     ]
@@ -49,11 +49,11 @@
     "provenance": true
   },
   "peerDependencies": {
-    "tau": "*",
+    "@tau/tau-agent": "*",
     "@oh-my-pi/pi-tui": "*"
   },
   "devDependencies": {
-    "tau": "^18.0.0",
+    "@tau/tau-agent": "^18.0.0",
     "@oh-my-pi/pi-tui": "^18.0.0",
     "@types/node": "^25.9.5",
     "typescript": "^5.6.0",

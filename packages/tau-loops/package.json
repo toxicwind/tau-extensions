@@ -19,7 +19,7 @@
 		"README.md",
 		"LICENSE"
 	],
-  "tau": {
+  "@tau/tau-agent": {
     "extensions": [
       "./src/extension.ts"
     ]
@@ -31,7 +31,7 @@
 		"loop:dir-diff": "bun scripts/run-dir-diff.ts"
 	},
   "peerDependencies": {
-    "tau": "^18.0.11"
+    "@tau/tau-agent": "^18.0.11"
   },
   "devDependencies": {
     "@types/bun": "latest",

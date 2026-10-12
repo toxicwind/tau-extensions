@@ -10,8 +10,8 @@
  * public TUI primitives re-exported from `tau`.
  * Anything fancier (Box, border, theme-aware padding) is internal.
  */
-import { Container, Text } from "tau";
-import type { MessageRenderOptions, Theme } from "tau";
+import { Container, Text } from "@tau/tau-agent";
+import type { MessageRenderOptions, Theme } from "@tau/tau-agent";
 
 /** Payload the extension stores via `pi.appendEntry("edit-committer", ...)`. */
 export interface CommitRecord {

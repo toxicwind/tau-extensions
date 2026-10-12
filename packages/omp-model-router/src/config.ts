@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { getAgentDir } from "tau";
+import { getAgentDir } from "@tau/tau-agent";
 import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import type {
 	AutoUpgradeConfig,

@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 import type { RouterState } from "../state";
 import type { Actions } from "./shared";
 import { profileNames, resolveProfileName } from "../config";

@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 import type { RouterState } from "../state";
 import { isDevInstall, getCurrentVersion, checkForUpdate } from "../version-check";
 import { detectCLI } from "../cli-detect";

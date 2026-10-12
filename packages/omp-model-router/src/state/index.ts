@@ -1,5 +1,5 @@
 import type { SessionCalibration } from "../calibration/types";
-import type { ExtensionAPI, ExtensionContext } from "tau";
+import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";

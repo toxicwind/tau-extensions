@@ -1,4 +1,4 @@
-import type { Theme } from "tau";
+import type { Theme } from "@tau/tau-agent";
 import type {
 	RoutingDecision,
 	RouterConfig,

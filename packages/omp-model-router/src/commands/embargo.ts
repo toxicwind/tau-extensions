@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 import type { RouterState } from "../state";
 
 export const handleEmbargo = (

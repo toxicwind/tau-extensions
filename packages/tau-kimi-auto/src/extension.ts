@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ProviderConfig } from "tau";
+import type { ExtensionAPI, ProviderConfig } from "@tau/tau-agent";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";

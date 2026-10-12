@@ -10,7 +10,7 @@ import { describe, expect, test } from "bun:test";
 import type {
 	EditToolDetails,
 	EditToolPerFileResult,
-} from "tau";
+} from "@tau/tau-agent";
 import {
 	type DiffSummary,
 	buildMessage,

@@ -9,7 +9,7 @@ import {
 	replaceTabs,
 	truncateToWidth,
 } from "@oh-my-pi/pi-tui";
-import type { KeybindingsManager, ModelRegistry, Theme } from "tau";
+import type { KeybindingsManager, ModelRegistry, Theme } from "@tau/tau-agent";
 import { buildSelectListTheme } from "./shared.js";
 import type { Model } from "@oh-my-pi/pi-ai";
 import type { RouterTier } from "../types";

@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 
 export const handleHelp = async (
 	_args: string[],

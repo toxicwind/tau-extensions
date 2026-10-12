@@ -1,6 +1,6 @@
 import type { Component, TUI, Tab } from "@oh-my-pi/pi-tui";
 import { Input, SelectList, TabBar, fuzzyFilter, replaceTabs, truncateToWidth, matchesKey } from "@oh-my-pi/pi-tui";
-import type { KeybindingsManager, Theme } from "tau";
+import type { KeybindingsManager, Theme } from "@tau/tau-agent";
 import { buildSelectListTheme } from "./shared.js";
 import { shortenModelRef } from "../ui/theme.js";
 

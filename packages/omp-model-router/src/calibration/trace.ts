@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
 import { appendFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
-import { getAgentDir } from "tau";
+import { getAgentDir } from "@tau/tau-agent";
 import type { TraceRecord } from "./types";
 import type { RouterTier } from "../types";
 

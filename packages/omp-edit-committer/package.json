@@ -28,10 +28,10 @@
     "test": "bun test"
   },
   "peerDependencies": {
-    "tau": "^18.0.11"
+    "@tau/tau-agent": "^18.0.11"
   },
   "devDependencies": {
-    "tau": "^18.0.11",
+    "@tau/tau-agent": "^18.0.11",
     "@types/bun": "latest",
     "typescript": "^5.6.0"
   }

@@ -4,7 +4,7 @@
  */
 
 import type { Context } from "@oh-my-pi/pi-ai";
-import type { ExtensionContext } from "tau";
+import type { ExtensionContext } from "@tau/tau-agent";
 import { parseCanonicalModelRef } from "../config";
 import type {
 	RouterTier,

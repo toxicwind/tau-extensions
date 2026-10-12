@@ -1,7 +1,7 @@
 import type {
 	ExtensionAPI,
 	ExtensionContext,
-} from "tau";
+} from "@tau/tau-agent";
 import {
 	loadRouterConfig,
 	patchConfigFile,

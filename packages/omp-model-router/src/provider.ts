@@ -14,7 +14,7 @@ import type { Effort } from "@oh-my-pi/pi-catalog/effort";
 import type {
 	ExtensionAPI,
 	ExtensionContext,
-} from "tau";
+} from "@tau/tau-agent";
 import type { RoutingDecision } from "./types";
 import { profileNames, parseCanonicalModelRef, ROUTER_TIERS, resolveProfileForTaskType } from "./config";
 import { resolveEffectivePin, setScopedPin } from "./routing/pin";

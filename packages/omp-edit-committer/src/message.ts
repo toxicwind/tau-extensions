@@ -34,7 +34,7 @@
 import type {
 	EditToolDetails,
 	EditToolPerFileResult,
-} from "tau";
+} from "@tau/tau-agent";
 
 /** Lightweight handle to the parts of a diff we care about. */
 export interface DiffSummary {
