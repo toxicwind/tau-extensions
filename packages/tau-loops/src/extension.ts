@@ -1,5 +1,5 @@
 /**
- * tau-loops — reusable audit loops for the sovereign stack.
+ * tau-loops — reusable audit loops for the estate-scripts stack.
  *
  * Every loop here exists because the same manual procedure burned real time
  * more than once: probe every model in the config and find the dead ones,

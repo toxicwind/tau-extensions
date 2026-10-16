@@ -173,7 +173,7 @@
     },
     {
       "name": "tau-flocksync",
-      "description": "flocksync / OmniRoute model router sync extension for Tau and sovereign agents.",
+      "description": "flocksync / OmniRoute model router sync extension for Tau and estate-scripts agents.",
       "version": "1.0.0",
       "source": "./tau-flocksync",
       "category": "model-routing",

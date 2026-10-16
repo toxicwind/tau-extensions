@@ -36,7 +36,7 @@ Coding agents live or die by their extensions, but extensions scatter: some on n
 | [`gsd-omp`](packages/gsd-omp) | 1.0.24 | orchestration | GSD Embeddable Orchestration System host plugin: binds the native extension, command, event, task, and filesystem surfaces to GSD via the Host-Integration SDK, with optional Goal Mode status mirroring |
 | [`omp-undo-redo`](packages/omp-undo-redo) | 1.6.2 | workflow | Undo/redo session navigation for Pi and Oh My Pi |
 | [`engram`](packages/engram) | 6.48.0 | memory | Private workspace package: persistent memory extension (`engram-memory.mjs`) with `memory` and `retrospective-eval` skills and `/doctor`, `/issue`, `/setup`, `/stats` slash commands |
-| [`tau-flocksync`](packages/tau-flocksync) | 1.0.0 | model-routing | flocksync / OmniRoute models sync extension for Tau and sovereign agents — syncs `:25193` / `:20130` catalogs into `models.json` with `/flocksync` and `/omni` commands |
+| [`tau-flocksync`](packages/tau-flocksync) | 1.0.0 | model-routing | flocksync / OmniRoute models sync extension for Tau and estate-scripts agents — syncs `:25193` / `:20130` catalogs into `models.json` with `/flocksync` and `/omni` commands |
 
 > Versions from each package's `package.json`. Eleven extensions are catalogued in `marketplace.json`; `engram` is a private workspace package (`"private": true`) and `omp-undo-redo` carries a minimal manifest entry.
 

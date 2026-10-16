@@ -1,6 +1,6 @@
 # tau-loops
 
-Audit loops for the sovereign stack, packaged as an omp extension.
+Audit loops for the estate-scripts stack, packaged as an omp extension.
 
 These exist because the same three investigations kept being done by hand, and
 each hand-run version got subtly wrong. Every loop below reads live state and
@@ -88,7 +88,7 @@ bun run typecheck
 bun test
 ```
 
-The live audit runs from the sovereign root so `.secrets` is loadable.
+The live audit runs from the estate-scripts root so `.secrets` is loadable.
 
 ```sh
 cd /home/toxic/estate

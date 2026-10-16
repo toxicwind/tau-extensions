@@ -1,6 +1,6 @@
 /**
  * Exercise the model-audit loop against the live config the engine actually
- * reads. Run from the sovereign root so `.secrets` is loadable:
+ * reads. Run from the estate-scripts root so `.secrets` is loadable:
  *
  *   set -a && . ./config/.secrets && set +a
  *   bun packages/tau-extensions/packages/tau-loops/scripts/run-model-audit.ts

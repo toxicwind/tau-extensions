@@ -1,7 +1,7 @@
 {
   "name": "@toxicwind/tau-loops",
   "version": "0.1.0",
-  "description": "Tau extension: reusable audit loops for the sovereign stack. Model/config liveness, undefined-role detection, two-tree diff with a consumer census, and a throwaway-extension probe runner.",
+  "description": "Tau extension: reusable audit loops for the estate-scripts stack. Model/config liveness, undefined-role detection, two-tree diff with a consumer census, and a throwaway-extension probe runner.",
   "type": "module",
   "license": "MIT",
   "repository": {

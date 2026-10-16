@@ -1,10 +1,10 @@
 # tau-flocksync
 
-OmniRoute & flocksync model router sync extension for [Tau](https://github.com/toxicwind/tau) and sovereign coding agents.
+OmniRoute & flocksync model router sync extension for [Tau](https://github.com/toxicwind/tau) and estate-scripts coding agents.
 
 ## What You Get
 
-- Sovereign first-class support for `tau` with `tau-natives` and `.tau/agent`.
+- estate-scripts first-class support for `tau` with `tau-natives` and `.tau/agent`.
 - Backwards-compatible support for `omp` and `pi`.
 - Dual-command interface: `/flocksync` and legacy `/omni`.
 - Dual-tool interfaces: `flocksync_status`, `flocksync_sync`, and legacy `omniroute_status`, `omniroute_sync`.

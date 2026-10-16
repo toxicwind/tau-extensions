@@ -30,7 +30,7 @@ export type ProbeRun = {
 
 export const DEFAULT_OMP = join(
 	homedir(),
-	"sovereign",
+	"estate-scripts",
 	"projects",
 	"tau",
 	"packages",

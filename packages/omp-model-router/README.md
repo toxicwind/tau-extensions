@@ -2,8 +2,8 @@
 
 <div align="right">
 
-[![License: MIT](https://img.shields.io/badge/license-MIT%20%2B%20upstream-blue?style=for-the-badge)](https://github.com/toxicwind/sovereign-projects#license)
-[![sovereign-projects](https://img.shields.io/badge/sovereign--projects-monorepo-blue?style=for-the-badge)](https://github.com/toxicwind/sovereign-projects)
+[![License: MIT](https://img.shields.io/badge/license-MIT%20%2B%20upstream-blue?style=for-the-badge)](https://github.com/toxicwind/estate-scripts-projects#license)
+[![estate-scripts-projects](https://img.shields.io/badge/estate-scripts--projects-monorepo-blue?style=for-the-badge)](https://github.com/toxicwind/estate-scripts-projects)
 [![npm](https://img.shields.io/badge/npm-%40cakriwut%2Fomp--model--router-cb3837?style=for-the-badge)](https://www.npmjs.com/package/@cakriwut/omp-model-router)
 
 </div>
