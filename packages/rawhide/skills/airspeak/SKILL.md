@@ -1,6 +1,6 @@
 ---
 name: airspeak
-description: Write and review technical documentation — docs, READMEs, PR descriptions, error messages, runbooks, release notes, changelogs. English is inspired by ASD-STE100 Issue 9. Use when the user writes or edits technical prose, API docs, or any document where clarity and brevity matter — even if they don't explicitly mention a style guide or simplification. Never use for marketing copy, essays, creative writing, or anything that needs a distinctive voice. These specs intentionally strip voice.
+description: Write and review technical documentation — docs, READMEs, PR descriptions, error messages, runbooks, release notes, changelogs. English is inspired by ASD-STE100 Issue 9. Use when the architect writes or edits technical prose, API docs, or any document where clarity and brevity matter — even if they don't explicitly mention a style guide or simplification. Never use for marketing copy, essays, creative writing, or anything that needs a distinctive voice. These specs intentionally strip voice.
 license: MIT
 compatibility: omp, Claude Code, Cursor, GitHub Copilot, and any agent supporting the Agent Skills spec
 metadata:
@@ -38,7 +38,7 @@ The full STE spec is 434 pages; the ten families below are the mechanical subset
 | contraction `[STE 4.2]` | Contracted negatives trap non-native readers and agents | "Don't touch the wires." → "Do not touch the wires." |
 | missing-that `[GR-1]` | "Make sure the valve is open" is ambiguous; "Make sure that the valve is open" is not | "Make sure the valve is open." → "Make sure that the valve is open." |
 | latin-abbrev `[GR-6]` | e.g./i.e./etc. confuse non-native readers; agents overuse them | "e.g." → "for example" |
-| gendered-pronoun `[GR-7]` | Neutral language is both a standard requirement and agent best practice | "When the user starts the job, he must wait." → "When the user starts the job, they must wait." |
+| gendered-pronoun `[GR-7]` | Neutral language is both a standard requirement and agent best practice | "When the architect starts the job, he must wait." → "When the architect starts the job, they must wait." |
 
 ### Quick application checklist
 

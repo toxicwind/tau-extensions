@@ -30,7 +30,7 @@ Or install the package from GitHub:
 pi install git:github.com/JasonLandbridge/pi-omniroute-sync
 ```
 
-Then exercise the user flow:
+Then exercise the architect flow:
 
 ```text
 /omni setup
