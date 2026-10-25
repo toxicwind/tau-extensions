@@ -3,14 +3,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { createOmniExtension, PiInput } = vi.hoisted(() => {
 	class Input {
 		private value = "";
-		handleInput(value: string) { this.value += value; }
-		setValue(value: string) { this.value = value; }
-		getValue() { return this.value; }
+		handleInput(value: string) {
+			this.value += value;
+		}
+		setValue(value: string) {
+			this.value = value;
+		}
+		getValue() {
+			return this.value;
+		}
 	}
 	return { createOmniExtension: vi.fn(async () => undefined), PiInput: Input };
 });
 vi.mock("../src/extension.ts", () => ({ createOmniExtension }));
-vi.mock("@oh-my-pi/pi-tui", () => ({ Input: PiInput, matchesKey: (data: string, key: string) => data === "\r" && key === "enter" }));
+vi.mock("@oh-my-pi/pi-tui", () => ({
+	Input: PiInput,
+	matchesKey: (data: string, key: string) => data === "\r" && key === "enter",
+}));
 
 import ompExtension from "../src/omp.ts";
 import piExtension from "../src/pi.ts";
@@ -38,7 +47,11 @@ describe("host adapters", () => {
 		expect(createOmniExtension).toHaveBeenCalledOnce();
 		const [received, options] = createOmniExtension.mock.calls[0];
 		expect(received).toBe(pi);
-		expect(options).toMatchObject({ homeEnvVar: "OMP_HOME", defaultHome: "~/.omp/agent", inferenceApi: "openai-completions" });
+		expect(options).toMatchObject({
+			homeEnvVar: "OMP_HOME",
+			defaultHome: "~/.omp/agent",
+			inferenceApi: "openai-completions",
+		});
 		expect(options.matchesKey("\r", "enter")).toBe(true);
 		expect(options.createInput("initial").getValue()).toBe("initial");
 	});
@@ -48,7 +61,11 @@ describe("host adapters", () => {
 		await tauExtension(tau as never);
 		expect(createOmniExtension).toHaveBeenCalledTimes(1);
 		const [, options] = createOmniExtension.mock.calls[0];
-		expect(options).toMatchObject({ homeEnvVar: "PI_CODING_AGENT_DIR", defaultHome: "~/.tau/agent", inferenceApi: "openai-responses" });
+		expect(options).toMatchObject({
+			homeEnvVar: "PI_CODING_AGENT_DIR",
+			defaultHome: "~/.tau/agent",
+			inferenceApi: "openai-responses",
+		});
 		expect(options.matchesKey("\r", "enter")).toBe(true);
 		expect(options.createInput("initial").getValue()).toBe("initial");
 	});

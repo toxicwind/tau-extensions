@@ -75,7 +75,10 @@ async function captureSseTokensPerSecond(response: Response, onCapture: (tps: nu
 	}
 }
 
-export async function captureTokensPerSecondFromResponse(response: Response, onCapture: (tps: number) => void): Promise<void> {
+export async function captureTokensPerSecondFromResponse(
+	response: Response,
+	onCapture: (tps: number) => void,
+): Promise<void> {
 	try {
 		const contentType = response.headers.get("content-type") ?? "";
 		if (contentType.toLowerCase().includes("text/event-stream")) {
@@ -93,7 +96,10 @@ export async function captureTokensPerSecondFromResponse(response: Response, onC
 export function isOmniRouteInferenceRequest(input: FetchInput, serverUrl: string): boolean {
 	try {
 		const base = new URL(serverUrl);
-		const requestUrl = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url, base);
+		const requestUrl = new URL(
+			typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
+			base,
+		);
 		const prefix = `${base.pathname.replace(/\/+$/, "")}/v1`;
 		return (
 			requestUrl.origin === base.origin &&
@@ -165,7 +171,7 @@ export function registerGatewayTelemetry(
 		} catch {
 			return;
 		}
-		const capture = captureTokensPerSecondFromResponse(clone, (bodyTps) => {
+		const capture = captureTokensPerSecondFromResponse(clone, bodyTps => {
 			if (runId === activeRunId && responseId === latestResponseId && isActiveRun()) captured = bodyTps;
 		});
 		pendingCaptures.add(capture);
@@ -207,7 +213,8 @@ export function registerGatewayTelemetry(
 		const runId = activeRunId;
 		await Promise.all([...pendingCaptures]);
 		if (runId !== activeRunId) return;
-		if (observedInference && isDisplayEnabled() && ctx.hasUI) ctx.ui.notify(`tok/s ${formatGatewayTokensPerSecond(captured)}`, "info");
+		if (observedInference && isDisplayEnabled() && ctx.hasUI)
+			ctx.ui.notify(`tok/s ${formatGatewayTokensPerSecond(captured)}`, "info");
 		resetRun();
 	});
 

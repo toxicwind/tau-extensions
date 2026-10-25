@@ -31,7 +31,6 @@ export interface OmniSettings {
 	apiKey: string;
 }
 
-
 /**
  * Default gateway URL. The host port is owned by the estate SSOT
  * (config/ports.env OMNIROUTE_PORT) and is deliberately NOT VansRouter's :20128;
@@ -62,7 +61,10 @@ const DEFAULT_SETTINGS: OmniSettings = {
 };
 
 export function resolveAgentHome(opts: AgentHomeOptions): string {
-	const env = (opts.homeEnvVar && process.env[opts.homeEnvVar]) ?? process.env.TAU_CODING_AGENT_DIR ?? process.env.PI_CODING_AGENT_DIR;
+	const env =
+		(opts.homeEnvVar && process.env[opts.homeEnvVar]) ??
+		process.env.TAU_CODING_AGENT_DIR ??
+		process.env.PI_CODING_AGENT_DIR;
 	if (env) return env;
 	const parts = opts.defaultHome.replace(/^~\//, "").split("/");
 	return join(homedir(), ...parts);
@@ -83,14 +85,19 @@ export function settingsPath(agentHome: string): string {
 export function sanitizeSettings(input: Partial<OmniSettings>): OmniSettings {
 	// Accept settings written by the short-lived millisecond version of autosync.
 	const legacyIntervalMs = (input as { autoSyncIntervalMs?: unknown }).autoSyncIntervalMs;
-	const intervalSeconds = input.autoSyncIntervalSeconds ?? (typeof legacyIntervalMs === "number" ? legacyIntervalMs / 1000 : undefined);
+	const intervalSeconds =
+		input.autoSyncIntervalSeconds ?? (typeof legacyIntervalMs === "number" ? legacyIntervalMs / 1000 : undefined);
 	return {
 		serverUrl: normalizeServerUrl(String(input.serverUrl || DEFAULT_SETTINGS.serverUrl)),
 		providerName: String(input.providerName || DEFAULT_SETTINGS.providerName).trim() || DEFAULT_SETTINGS.providerName,
 		onlyShowUsableModels: input.onlyShowUsableModels !== false,
 		showGlobalRoutingModels: input.showGlobalRoutingModels !== false,
-		includeModels: Array.isArray(input.includeModels) ? input.includeModels.filter((value): value is string => typeof value === "string") : [],
-		excludeModels: Array.isArray(input.excludeModels) ? input.excludeModels.filter((value): value is string => typeof value === "string") : [],
+		includeModels: Array.isArray(input.includeModels)
+			? input.includeModels.filter((value): value is string => typeof value === "string")
+			: [],
+		excludeModels: Array.isArray(input.excludeModels)
+			? input.excludeModels.filter((value): value is string => typeof value === "string")
+			: [],
 		syncOnStartup: input.syncOnStartup !== false,
 		modelCacheTtlMinutes:
 			Number.isFinite(input.modelCacheTtlMinutes) && input.modelCacheTtlMinutes! >= 0
@@ -102,7 +109,9 @@ export function sanitizeSettings(input: Partial<OmniSettings>): OmniSettings {
 				: DEFAULT_SETTINGS.autoSyncIntervalSeconds,
 		showGatewayTokensPerSecond: input.showGatewayTokensPerSecond === true,
 		lastSuccessfulSyncAt:
-			Number.isFinite(input.lastSuccessfulSyncAt) && input.lastSuccessfulSyncAt! >= 0 ? input.lastSuccessfulSyncAt! : 0,
+			Number.isFinite(input.lastSuccessfulSyncAt) && input.lastSuccessfulSyncAt! >= 0
+				? input.lastSuccessfulSyncAt!
+				: 0,
 		onUnreachable: ON_UNREACHABLE_VALUES.includes(input.onUnreachable as OnUnreachable)
 			? (input.onUnreachable as OnUnreachable)
 			: DEFAULT_SETTINGS.onUnreachable,

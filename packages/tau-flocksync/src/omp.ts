@@ -9,7 +9,7 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 		defaultHome: "~/.omp/agent",
 		inferenceApi: "openai-completions",
 		matchesKey,
-		createInput: (initialValue) => {
+		createInput: initialValue => {
 			const input = new Input();
 			input.setValue(initialValue);
 			return input;

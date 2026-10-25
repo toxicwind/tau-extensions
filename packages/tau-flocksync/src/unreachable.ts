@@ -43,19 +43,20 @@ const UNREACHABLE_ERROR_PATTERN =
 	/\b(?:408|5\d{2})\b|\b(?:ECONNREFUSED|ECONNRESET|ECONNABORTED|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH|ENOTFOUND|EAI_AGAIN)\b|(?:fetch failed|network error|connection (?:error|failure|refused|reset|closed)|timed?\s*out|timeout|socket)/i;
 
 export function isUnreachableRequestFailure(message: AgentEndMessage | undefined, omniProviderName: string): boolean {
-	if (message?.role !== "assistant" || message.provider !== omniProviderName || message.stopReason !== "error") return false;
+	if (message?.role !== "assistant" || message.provider !== omniProviderName || message.stopReason !== "error")
+		return false;
 	return UNREACHABLE_ERROR_PATTERN.test(message.errorMessage ?? "");
 }
 
-export function isOmniActiveModel(
-	model: { provider?: string } | undefined,
-	omniProviderName: string,
-): boolean {
+export function isOmniActiveModel(model: { provider?: string } | undefined, omniProviderName: string): boolean {
 	return !model?.provider || model.provider === omniProviderName;
 }
 
 export function shouldAttemptHop(
-	options: Pick<UnreachableHopOptions, "onUnreachable" | "omniProviderName" | "currentProvider" | "currentModelId" | "fallbackModel">,
+	options: Pick<
+		UnreachableHopOptions,
+		"onUnreachable" | "omniProviderName" | "currentProvider" | "currentModelId" | "fallbackModel"
+	>,
 ): boolean {
 	if (options.onUnreachable !== "host-fallback") return false;
 	if (options.currentProvider && options.currentProvider !== options.omniProviderName) return false;
@@ -68,7 +69,11 @@ export async function hopOnUnreachable(event: UnreachableEvent, options: Unreach
 	const target = parseFallbackModel(options.fallbackModel);
 	if (!shouldAttemptHop(options)) {
 		const activeOmni = !options.currentProvider || options.currentProvider === options.omniProviderName;
-		if (options.onUnreachable === "host-fallback" && activeOmni && (!target || target.provider === options.omniProviderName)) {
+		if (
+			options.onUnreachable === "host-fallback" &&
+			activeOmni &&
+			(!target || target.provider === options.omniProviderName)
+		) {
 			options.notify?.(
 				`OmniRoute unreachable at ${event.serverUrl}. Configure fallbackModel as an authenticated host provider/id, or use /model <provider/id> manually.`,
 				"warning",
@@ -121,15 +126,21 @@ export function createUnreachableController(): {
 	return {
 		async probe(config, signal, force = false) {
 			if (inFlight?.url === config.serverUrl && inFlight.signal === signal) return inFlight.promise;
-			if (!force && lastSuccess && lastSuccess.url === config.serverUrl && Date.now() - lastSuccess.at < SUCCESS_PROBE_CACHE_MS) {
+			if (
+				!force &&
+				lastSuccess &&
+				lastSuccess.url === config.serverUrl &&
+				Date.now() - lastSuccess.at < SUCCESS_PROBE_CACHE_MS
+			) {
 				return { ok: true, unreachable: false };
 			}
 
 			const startedAt = generation;
 			const startedRequest = ++requestId;
 			const promise = probeHealth(config, signal)
-				.then((result) => {
-					if (result.ok && generation === startedAt && requestId === startedRequest) lastSuccess = { url: config.serverUrl, at: Date.now() };
+				.then(result => {
+					if (result.ok && generation === startedAt && requestId === startedRequest)
+						lastSuccess = { url: config.serverUrl, at: Date.now() };
 					else if (!result.ok) lastSuccess = undefined;
 					return result;
 				})

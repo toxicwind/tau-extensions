@@ -1,7 +1,17 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { modelsJsonPath, saveSettings, type OmniConfig, type OmniSettings } from "./config.ts";
-import type { OmniPI, OmniRequestModel, OmniThinking, ProviderApi, ProviderCompat, ProviderEntry, ProviderModelConfig, ProviderThinkingLevel, ProviderThinkingLevelMap } from "./contracts.ts";
+import type {
+	OmniPI,
+	OmniRequestModel,
+	OmniThinking,
+	ProviderApi,
+	ProviderCompat,
+	ProviderEntry,
+	ProviderModelConfig,
+	ProviderThinkingLevel,
+	ProviderThinkingLevelMap,
+} from "./contracts.ts";
 
 const DEFAULT_PROVIDER_API: ProviderApi = "openai-responses";
 export const PROVIDER_COMPAT: ProviderCompat = {
@@ -143,8 +153,19 @@ async function requestJson<T>(
 }
 
 /** Older hosts build these fields without reading newer catalog capability metadata. */
-export function transformProviderPayload(payload: unknown, model: OmniRequestModel | undefined, providerName: string): unknown {
-	if (!model || model.provider !== providerName || typeof payload !== "object" || payload === null || Array.isArray(payload)) return payload;
+export function transformProviderPayload(
+	payload: unknown,
+	model: OmniRequestModel | undefined,
+	providerName: string,
+): unknown {
+	if (
+		!model ||
+		model.provider !== providerName ||
+		typeof payload !== "object" ||
+		payload === null ||
+		Array.isArray(payload)
+	)
+		return payload;
 
 	const next = { ...(payload as Record<string, unknown>) };
 	let changed = false;
@@ -205,14 +226,14 @@ export async function checkModelsEndpoint(config: OmniConfig, signal?: AbortSign
 
 function rawModalities(value: unknown): string[] {
 	if (!Array.isArray(value)) return [];
-	return value.map((item) => String(item).trim().toLowerCase()).filter(Boolean);
+	return value.map(item => String(item).trim().toLowerCase()).filter(Boolean);
 }
 
 function normalizeInputModalities(model: OmniApiModel): string[] {
 	const raw = rawModalities(model.input_modalities ?? model.input);
 	const capabilities = model.capabilities;
 	const visual =
-		raw.some((item) => VISUAL_MODALITIES.has(item)) ||
+		raw.some(item => VISUAL_MODALITIES.has(item)) ||
 		capabilities?.vision === true ||
 		capabilities?.attachment === true ||
 		capabilities?.pdf === true ||
@@ -239,8 +260,8 @@ function mapThinking(model: OmniApiModel): OmniThinking | undefined {
 		new Set(
 			raw
 				.filter((item): item is string => typeof item === "string")
-				.map((item) => item.trim().toLowerCase())
-				.filter((item) => OMP_EFFORTS.has(item)),
+				.map(item => item.trim().toLowerCase())
+				.filter(item => OMP_EFFORTS.has(item)),
 		),
 	);
 	if (efforts.length === 0) return undefined;
@@ -252,7 +273,7 @@ function thinkingLevelMap(thinking: OmniThinking | undefined): ProviderThinkingL
 	const supported = new Set(thinking.efforts);
 	return {
 		off: "none",
-		...Object.fromEntries(THINKING_LEVELS.map((level) => [level, supported.has(level) ? level : null])),
+		...Object.fromEntries(THINKING_LEVELS.map(level => [level, supported.has(level) ? level : null])),
 	} as ProviderThinkingLevelMap;
 }
 
@@ -262,7 +283,7 @@ function positiveNumber(value: unknown): number | undefined {
 }
 
 function upsertSyncedModel(models: SyncedModel[], next: SyncedModel): void {
-	const index = models.findIndex((model) => model.id === next.id);
+	const index = models.findIndex(model => model.id === next.id);
 	if (index < 0) {
 		models.push(next);
 		return;
@@ -288,7 +309,10 @@ export function isGlobalRoutingModel(id: string): boolean {
 }
 
 export function globMatches(value: string, pattern: string): boolean {
-	const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".*").replaceAll("?", ".");
+	const escaped = pattern
+		.replace(/[.+^${}()|[\]\\]/g, "\\$&")
+		.replaceAll("*", ".*")
+		.replaceAll("?", ".");
 	return new RegExp(`^${escaped}$`).test(value);
 }
 
@@ -302,19 +326,24 @@ export function shouldIncludeModel(
 		if (model.enabled === false) return false;
 		if (model.id.includes("/") && !isGlobalRoutingModel(model.id)) {
 			const prefix = model.id.split("/")[0];
-			const isUsable = usableProviders?.has(prefix) || (model.owned_by ? usableProviders?.has(model.owned_by) : false);
+			const isUsable =
+				usableProviders?.has(prefix) || (model.owned_by ? usableProviders?.has(model.owned_by) : false);
 			if (!isUsable) return false;
 		}
 	}
-	if (settings.includeModels.length && !settings.includeModels.some((pattern) => globMatches(model.id, pattern))) return false;
-	return !settings.excludeModels.some((pattern) => globMatches(model.id, pattern));
+	if (settings.includeModels.length && !settings.includeModels.some(pattern => globMatches(model.id, pattern)))
+		return false;
+	return !settings.excludeModels.some(pattern => globMatches(model.id, pattern));
 }
 
 export function usableProviderAliases(connections: ProviderConnection[], pricing: PricingProvider[]): Set<string> {
 	const canonicals = new Set(
 		connections
-			.filter((connection) => connection.isActive === true && (!connection.testStatus || connection.testStatus === "active"))
-			.map((connection) => connection.provider)
+			.filter(
+				connection =>
+					connection.isActive === true && (!connection.testStatus || connection.testStatus === "active"),
+			)
+			.map(connection => connection.provider)
 			.filter((provider): provider is string => Boolean(provider)),
 	);
 	const aliases = new Set(canonicals);
@@ -329,7 +358,8 @@ export function usableProviderAliases(connections: ProviderConnection[], pricing
 	for (const provider of pricing) {
 		if (provider.id && canonicals.has(provider.id)) {
 			if (typeof provider.alias === "string" && provider.alias.trim()) aliases.add(provider.alias.trim());
-			if (typeof provider.displayPrefix === "string" && provider.displayPrefix.trim()) aliases.add(provider.displayPrefix.trim());
+			if (typeof provider.displayPrefix === "string" && provider.displayPrefix.trim())
+				aliases.add(provider.displayPrefix.trim());
 		}
 	}
 	return aliases;
@@ -350,7 +380,13 @@ async function fetchUsableProviders(config: OmniConfig, signal?: AbortSignal): P
 
 async function fetchPricing(config: OmniConfig, signal?: AbortSignal): Promise<Record<string, ModelPricing>> {
 	try {
-		const providers = await requestJson<Record<string, Record<string, ModelPricing>>>(config, "/api/pricing", {}, 10_000, signal);
+		const providers = await requestJson<Record<string, Record<string, ModelPricing>>>(
+			config,
+			"/api/pricing",
+			{},
+			10_000,
+			signal,
+		);
 		const result: Record<string, ModelPricing> = {};
 		for (const [provider, models] of Object.entries(providers)) {
 			if (!models || typeof models !== "object") continue;
@@ -370,7 +406,11 @@ export function modelCost(pricing?: ModelPricing): ProviderModelConfig["cost"] {
 	return {
 		input: Number.isFinite(pricing?.input) ? pricing!.input! : 0,
 		output: Number.isFinite(pricing?.output) ? pricing!.output! : 0,
-		cacheRead: Number.isFinite(pricing?.cached) ? pricing!.cached! : Number.isFinite(pricing?.cacheRead) ? pricing!.cacheRead! : 0,
+		cacheRead: Number.isFinite(pricing?.cached)
+			? pricing!.cached!
+			: Number.isFinite(pricing?.cacheRead)
+				? pricing!.cacheRead!
+				: 0,
 		cacheWrite: Number.isFinite(pricing?.cache_creation)
 			? pricing!.cache_creation!
 			: Number.isFinite(pricing?.cacheWrite)
@@ -401,9 +441,9 @@ async function fetchSyncedModels(config: OmniConfig, signal?: AbortSignal): Prom
 			input: normalizeInputModalities(model),
 			reasoning: Boolean(
 				model.reasoning ||
-					model.capabilities?.reasoning ||
-					model.capabilities?.thinking ||
-					model.capabilities?.supportsThinking,
+				model.capabilities?.reasoning ||
+				model.capabilities?.thinking ||
+				model.capabilities?.supportsThinking,
 			),
 			thinking,
 			thinkingLevelMap: thinkingLevelMap(thinking),
@@ -442,7 +482,8 @@ function buildModel(model: SyncedModel, pricing?: ModelPricing): ProviderModelCo
 	if (model.supportsTools !== undefined) config.supportsTools = model.supportsTools;
 	if (model.thinking) {
 		config.thinking = model.thinking;
-		if (providerApi() === DEFAULT_PROVIDER_API) config.thinkingLevelMap = model.thinkingLevelMap ?? thinkingLevelMap(model.thinking);
+		if (providerApi() === DEFAULT_PROVIDER_API)
+			config.thinkingLevelMap = model.thinkingLevelMap ?? thinkingLevelMap(model.thinking);
 	}
 	return config;
 }
@@ -457,17 +498,21 @@ function buildAutoModel(id: string): ProviderModelConfig {
 	});
 }
 
-export async function discoverModels(config: OmniConfig, settings: OmniSettings, signal?: AbortSignal): Promise<ProviderModelConfig[]> {
+export async function discoverModels(
+	config: OmniConfig,
+	settings: OmniSettings,
+	signal?: AbortSignal,
+): Promise<ProviderModelConfig[]> {
 	const [synced, usableProviders, pricing] = await Promise.all([
 		fetchSyncedModels(config, signal),
 		settings.onlyShowUsableModels ? fetchUsableProviders(config, signal) : undefined,
 		fetchPricing(config, signal),
 	]);
-	const syncedIds = new Set(synced.map((model) => model.id));
+	const syncedIds = new Set(synced.map(model => model.id));
 	return [
-		...(settings.showGlobalRoutingModels ? AUTO_MODELS.filter((id) => !syncedIds.has(id)).map(buildAutoModel) : []),
+		...(settings.showGlobalRoutingModels ? AUTO_MODELS.filter(id => !syncedIds.has(id)).map(buildAutoModel) : []),
 		...synced
-			.filter((model) =>
+			.filter(model =>
 				shouldIncludeModel(
 					model,
 					usableProviders === undefined && settings.onlyShowUsableModels
@@ -476,7 +521,7 @@ export async function discoverModels(config: OmniConfig, settings: OmniSettings,
 					usableProviders,
 				),
 			)
-			.map((model) => buildModel(model, pricing[model.id] ?? pricing[model.id.split("/").at(-1) ?? model.id])),
+			.map(model => buildModel(model, pricing[model.id] ?? pricing[model.id.split("/").at(-1) ?? model.id])),
 	];
 }
 
@@ -503,7 +548,7 @@ function persistModels(agentHome: string, config: OmniConfig, models: ProviderMo
 	const path = modelsJsonPath(agentHome);
 	const file = readModelsJson(agentHome);
 	file.providers ??= {};
-	const persistedModels = models.map((model) => {
+	const persistedModels = models.map(model => {
 		if (!model.omitMaxOutputTokens) return model;
 		const { maxTokens: _maxTokens, ...withoutMaxTokens } = model;
 		return withoutMaxTokens as ProviderModelConfig;
@@ -535,38 +580,45 @@ export async function registerOmniProvider(
 }
 
 export function normalizePersistedModels(models: Array<Partial<ProviderModelConfig>>): ProviderModelConfig[] {
-	return models.filter((model): model is Partial<ProviderModelConfig> & Pick<ProviderModelConfig, "id"> => Boolean(model.id)).map((model) => {
-		const contextWindow = model.contextWindow ?? 128_000;
-		const hasOutputLimit = typeof model.maxTokens === "number" && Number.isFinite(model.maxTokens) && model.maxTokens > 0;
-		const omitMaxOutputTokens = model.omitMaxOutputTokens ?? !hasOutputLimit;
-		const next: ProviderModelConfig = {
-			id: model.id,
-			name: model.name ?? model.id,
-			api: providerApi(),
-			reasoning: model.reasoning ?? false,
-			input: model.input ?? ["text"],
-			cost: { ...ZERO_COST, ...model.cost, tiers: model.cost?.tiers ?? [] },
-			contextWindow,
-			maxTokens: model.maxTokens ?? contextWindow,
-			compat: { ...modelCompat(omitMaxOutputTokens), ...model.compat },
-		};
-		if (omitMaxOutputTokens) next.omitMaxOutputTokens = true;
-		if (model.supportsTools !== undefined) next.supportsTools = model.supportsTools;
-		if (model.thinking) {
-			next.thinking = model.thinking;
-			if (providerApi() === DEFAULT_PROVIDER_API) next.thinkingLevelMap = model.thinkingLevelMap ?? thinkingLevelMap(model.thinking);
-		} else if (model.thinkingLevelMap) {
-			next.thinkingLevelMap = model.thinkingLevelMap;
-		}
-		return next;
-	});
+	return models
+		.filter((model): model is Partial<ProviderModelConfig> & Pick<ProviderModelConfig, "id"> => Boolean(model.id))
+		.map(model => {
+			const contextWindow = model.contextWindow ?? 128_000;
+			const hasOutputLimit =
+				typeof model.maxTokens === "number" && Number.isFinite(model.maxTokens) && model.maxTokens > 0;
+			const omitMaxOutputTokens = model.omitMaxOutputTokens ?? !hasOutputLimit;
+			const next: ProviderModelConfig = {
+				id: model.id,
+				name: model.name ?? model.id,
+				api: providerApi(),
+				reasoning: model.reasoning ?? false,
+				input: model.input ?? ["text"],
+				cost: { ...ZERO_COST, ...model.cost, tiers: model.cost?.tiers ?? [] },
+				contextWindow,
+				maxTokens: model.maxTokens ?? contextWindow,
+				compat: { ...modelCompat(omitMaxOutputTokens), ...model.compat },
+			};
+			if (omitMaxOutputTokens) next.omitMaxOutputTokens = true;
+			if (model.supportsTools !== undefined) next.supportsTools = model.supportsTools;
+			if (model.thinking) {
+				next.thinking = model.thinking;
+				if (providerApi() === DEFAULT_PROVIDER_API)
+					next.thinkingLevelMap = model.thinkingLevelMap ?? thinkingLevelMap(model.thinking);
+			} else if (model.thinkingLevelMap) {
+				next.thinkingLevelMap = model.thinkingLevelMap;
+			}
+			return next;
+		});
 }
 
 export function isSyncStale(
 	settings: Pick<OmniSettings, "lastSuccessfulSyncAt" | "modelCacheTtlMinutes">,
 	now = Date.now(),
 ): boolean {
-	return settings.lastSuccessfulSyncAt === 0 || now - settings.lastSuccessfulSyncAt >= settings.modelCacheTtlMinutes * 60_000;
+	return (
+		settings.lastSuccessfulSyncAt === 0 ||
+		now - settings.lastSuccessfulSyncAt >= settings.modelCacheTtlMinutes * 60_000
+	);
 }
 
 export function reloadOmniProvider(pi: OmniPI, agentHome: string, config: OmniConfig): void {
@@ -623,6 +675,6 @@ export async function testChat(config: OmniConfig, model: string, signal?: Abort
 		20_000,
 		signal,
 	);
-	const content = data.output_text ?? data.output?.flatMap((item) => item.content ?? []).find((item) => item.text)?.text;
+	const content = data.output_text ?? data.output?.flatMap(item => item.content ?? []).find(item => item.text)?.text;
 	return typeof content === "string" ? content.trim() : JSON.stringify(data).slice(0, 200);
 }

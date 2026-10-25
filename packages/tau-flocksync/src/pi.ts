@@ -8,7 +8,7 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 		homeEnvVar: "PI_HOME",
 		defaultHome: "~/.pi/agent",
 		matchesKey,
-		createInput: (initialValue) => {
+		createInput: initialValue => {
 			const input = new Input();
 			if (initialValue) input.handleInput(initialValue);
 			return input;

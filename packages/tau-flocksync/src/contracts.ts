@@ -165,9 +165,15 @@ export interface OmniPI {
 	on(event: "agent_start", handler: (event: AgentStartEvent, ctx: OmniContext) => void | Promise<void>): void;
 	on(event: "turn_start", handler: (event: unknown, ctx: OmniContext) => void | Promise<void>): void;
 	on(event: "agent_end", handler: (event: AgentEndEvent, ctx: OmniContext) => void | Promise<void>): void;
-	on(event: "after_provider_response", handler: (event: ProviderResponseEvent, ctx: OmniContext) => void | Promise<void>): void;
+	on(
+		event: "after_provider_response",
+		handler: (event: ProviderResponseEvent, ctx: OmniContext) => void | Promise<void>,
+	): void;
 	on(event: "agent_settled", handler: (event: AgentSettledEvent, ctx: OmniContext) => void | Promise<void>): void;
-	on(event: "before_provider_request", handler: (event: ProviderRequestEvent, ctx: OmniContext) => unknown | Promise<unknown>): void;
+	on(
+		event: "before_provider_request",
+		handler: (event: ProviderRequestEvent, ctx: OmniContext) => unknown | Promise<unknown>,
+	): void;
 	on(event: "session_shutdown", handler: () => void): void;
 	on(
 		event: "model_select",

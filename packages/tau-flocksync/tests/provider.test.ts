@@ -2,7 +2,22 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
-import { checkHealth, globMatches, isGlobalRoutingModel, isSyncStale, modelCost, normalizePersistedModels, probeHealth, PROVIDER_COMPAT, registerOmniProvider, reloadOmniProvider, setInferenceApi, shouldIncludeModel, transformProviderPayload, usableProviderAliases } from "../src/provider.ts";
+import {
+	checkHealth,
+	globMatches,
+	isGlobalRoutingModel,
+	isSyncStale,
+	modelCost,
+	normalizePersistedModels,
+	probeHealth,
+	PROVIDER_COMPAT,
+	registerOmniProvider,
+	reloadOmniProvider,
+	setInferenceApi,
+	shouldIncludeModel,
+	transformProviderPayload,
+	usableProviderAliases,
+} from "../src/provider.ts";
 
 const fetchStub = vi.spyOn(globalThis, "fetch");
 
@@ -16,7 +31,9 @@ it("uses OmniRoute's supported session-affinity headers", () => {
 it("checks OmniRoute's lightweight health endpoint", async () => {
 	fetchStub.mockResolvedValue(new Response(null, { status: 200 }));
 
-	expect(await checkHealth({ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" })).toBe(true);
+	expect(await checkHealth({ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" })).toBe(
+		true,
+	);
 	expect(fetchStub).toHaveBeenCalledWith(
 		"http://localhost:20128/api/health/ping",
 		expect.objectContaining({ headers: { Authorization: "Bearer secret" } }),
@@ -44,7 +61,9 @@ it("normalizes legacy persisted models for Responses and cost tiers", () => {
 it("migrates persisted models to the active host API and omits unknown output caps", () => {
 	setInferenceApi("openai-completions");
 	try {
-		const [model] = normalizePersistedModels([{ id: "openai/gpt-5", api: "openai-responses", contextWindow: 200_000 }]);
+		const [model] = normalizePersistedModels([
+			{ id: "openai/gpt-5", api: "openai-responses", contextWindow: 200_000 },
+		]);
 		expect(model.api).toBe("openai-completions");
 		expect(model.maxTokens).toBe(200_000);
 		expect(model.omitMaxOutputTokens).toBe(true);
@@ -55,19 +74,26 @@ it("migrates persisted models to the active host API and omits unknown output ca
 
 it("reloads legacy persisted models with the active host transport", () => {
 	const agentHome = mkdtempSync(join(tmpdir(), "pi-omni-provider-"));
-	writeFileSync(join(agentHome, "models.json"), JSON.stringify({
-		providers: {
-			omni: {
-				baseUrl: "http://localhost:20128/v1",
-				api: "openai-responses",
-				models: [{ id: "openai/gpt-5", api: "openai-responses", contextWindow: 200_000 }],
+	writeFileSync(
+		join(agentHome, "models.json"),
+		JSON.stringify({
+			providers: {
+				omni: {
+					baseUrl: "http://localhost:20128/v1",
+					api: "openai-responses",
+					models: [{ id: "openai/gpt-5", api: "openai-responses", contextWindow: 200_000 }],
+				},
 			},
-		},
-	}));
+		}),
+	);
 	const registerProvider = vi.fn();
 	setInferenceApi("openai-completions");
 	try {
-		reloadOmniProvider({ registerProvider } as never, agentHome, { serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" });
+		reloadOmniProvider({ registerProvider } as never, agentHome, {
+			serverUrl: "http://localhost:20128",
+			apiKey: "secret",
+			providerName: "omni",
+		});
 	} finally {
 		setInferenceApi("openai-responses");
 	}
@@ -89,7 +115,11 @@ it("rewrites unsupported provider request fields from catalog capabilities", () 
 		parallel_tool_calls: true,
 	};
 
-	const rewritten = transformProviderPayload(payload, { provider: "omni", omitMaxOutputTokens: true, supportsTools: false }, "omni");
+	const rewritten = transformProviderPayload(
+		payload,
+		{ provider: "omni", omitMaxOutputTokens: true, supportsTools: false },
+		"omni",
+	);
 
 	expect(rewritten).toEqual({ model: "openai/gpt-5" });
 	expect(payload.max_output_tokens).toBe(128_000);
@@ -97,7 +127,7 @@ it("rewrites unsupported provider request fields from catalog capabilities", () 
 });
 
 it("persists a keyless OMP marker without leaking the API key", async () => {
-	fetchStub.mockImplementation(async (input) => {
+	fetchStub.mockImplementation(async input => {
 		const url = String(input);
 		const body = url.endsWith("/v1/models")
 			? { data: [{ id: "openai/gpt-5", name: "GPT-5" }] }
@@ -111,7 +141,22 @@ it("persists a keyless OMP marker without leaking the API key", async () => {
 		{ registerProvider } as never,
 		agentHome,
 		{ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" },
-		{ onlyShowUsableModels: false, showGlobalRoutingModels: false, includeModels: [], excludeModels: [], syncOnStartup: true, modelCacheTtlMinutes: 60, autoSyncIntervalSeconds: 300, showGatewayTokensPerSecond: true, lastSuccessfulSyncAt: 0, onUnreachable: "none", fallbackModel: "", serverUrl: "http://localhost:20128", providerName: "omni", apiKey: "secret" },
+		{
+			onlyShowUsableModels: false,
+			showGlobalRoutingModels: false,
+			includeModels: [],
+			excludeModels: [],
+			syncOnStartup: true,
+			modelCacheTtlMinutes: 60,
+			autoSyncIntervalSeconds: 300,
+			showGatewayTokensPerSecond: true,
+			lastSuccessfulSyncAt: 0,
+			onUnreachable: "none",
+			fallbackModel: "",
+			serverUrl: "http://localhost:20128",
+			providerName: "omni",
+			apiKey: "secret",
+		},
 	);
 
 	const persisted = JSON.parse(readFileSync(join(agentHome, "models.json"), "utf8"));
@@ -267,21 +312,32 @@ it("includes models matching custom provider prefix or owned_by when onlyShowUsa
 	const usable = new Set(["openai", "cosmoshub"]);
 
 	expect(shouldIncludeModel({ id: "cosmoshub/qwen-3.7-max", enabled: true }, settings, usable)).toBe(true);
-	expect(shouldIncludeModel({ id: "unknown-prefix/model", owned_by: "cosmoshub", enabled: true }, settings, usable)).toBe(true);
+	expect(
+		shouldIncludeModel({ id: "unknown-prefix/model", owned_by: "cosmoshub", enabled: true }, settings, usable),
+	).toBe(true);
 	expect(shouldIncludeModel({ id: "unregistered/model", enabled: true }, settings, usable)).toBe(false);
 });
 
-
 it("maps vision capabilities, limits, and pricing from the catalog", async () => {
-	fetchStub.mockImplementation(async (input) => {
+	fetchStub.mockImplementation(async input => {
 		const url = String(input);
 		if (url.endsWith("/v1/models")) {
-			return new Response(JSON.stringify({
-				data: [
-					{ id: "openai/gpt-vision", name: "Vision", capabilities: { vision: true, tool_calling: true }, effort_tiers: ["low", "high"], context_length: 200000, max_output_tokens: 64000 },
-					{ id: "google/audio-only", name: "Audio", type: "audio" },
-				],
-			}), { status: 200 });
+			return new Response(
+				JSON.stringify({
+					data: [
+						{
+							id: "openai/gpt-vision",
+							name: "Vision",
+							capabilities: { vision: true, tool_calling: true },
+							effort_tiers: ["low", "high"],
+							context_length: 200000,
+							max_output_tokens: 64000,
+						},
+						{ id: "google/audio-only", name: "Audio", type: "audio" },
+					],
+				}),
+				{ status: 200 },
+			);
 		}
 		if (url.includes("/api/pricing")) {
 			return new Response(JSON.stringify({ openai: { "gpt-vision": { input: 5, output: 15 } } }), { status: 200 });
@@ -291,49 +347,90 @@ it("maps vision capabilities, limits, and pricing from the catalog", async () =>
 	const { discoverModels } = await import("../src/provider.ts");
 	const models = await discoverModels(
 		{ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" },
-		{ onlyShowUsableModels: false, showGlobalRoutingModels: false, includeModels: [], excludeModels: [], syncOnStartup: true, modelCacheTtlMinutes: 60, autoSyncIntervalSeconds: 300, showGatewayTokensPerSecond: true, lastSuccessfulSyncAt: 0, onUnreachable: "none", fallbackModel: "", serverUrl: "http://localhost:20128", providerName: "omni", apiKey: "secret" },
+		{
+			onlyShowUsableModels: false,
+			showGlobalRoutingModels: false,
+			includeModels: [],
+			excludeModels: [],
+			syncOnStartup: true,
+			modelCacheTtlMinutes: 60,
+			autoSyncIntervalSeconds: 300,
+			showGatewayTokensPerSecond: true,
+			lastSuccessfulSyncAt: 0,
+			onUnreachable: "none",
+			fallbackModel: "",
+			serverUrl: "http://localhost:20128",
+			providerName: "omni",
+			apiKey: "secret",
+		},
 	);
-	const vision = models.find((model) => model.id === "openai/gpt-vision");
+	const vision = models.find(model => model.id === "openai/gpt-vision");
 	expect(vision?.input).toEqual(["text", "image"]);
 	expect(vision?.supportsTools).toBe(true);
 	expect(vision?.thinking?.efforts).toEqual(["low", "high"]);
-	expect(vision?.thinkingLevelMap).toEqual({ off: "none", minimal: null, low: "low", medium: null, high: "high", xhigh: null, max: null });
+	expect(vision?.thinkingLevelMap).toEqual({
+		off: "none",
+		minimal: null,
+		low: "low",
+		medium: null,
+		high: "high",
+		xhigh: null,
+		max: null,
+	});
 	expect(vision?.contextWindow).toBe(200000);
 	expect(vision?.maxTokens).toBe(64000);
 	expect(vision?.cost.input).toBe(5);
-	expect(models.some((model) => model.id === "google/audio-only")).toBe(false);
+	expect(models.some(model => model.id === "google/audio-only")).toBe(false);
 });
 
 it("normalizes every visual capability into text and image inputs", async () => {
-	fetchStub.mockImplementation(async (input) => {
+	fetchStub.mockImplementation(async input => {
 		const url = String(input);
 		if (url.endsWith("/v1/models")) {
-			return new Response(JSON.stringify({
-				data: [
-					{ id: "image-only", input_modalities: ["image"] },
-					{ id: "attachment-capability", capabilities: { attachment: true } },
-					{ id: "pdf-capability", capabilities: { pdf: true } },
-					{ id: "video-capability", capabilities: { video: true } },
-					{ id: "pdf-type", type: "pdf" },
-				],
-			}), { status: 200 });
+			return new Response(
+				JSON.stringify({
+					data: [
+						{ id: "image-only", input_modalities: ["image"] },
+						{ id: "attachment-capability", capabilities: { attachment: true } },
+						{ id: "pdf-capability", capabilities: { pdf: true } },
+						{ id: "video-capability", capabilities: { video: true } },
+						{ id: "pdf-type", type: "pdf" },
+					],
+				}),
+				{ status: 200 },
+			);
 		}
 		return new Response("{}", { status: 200 });
 	});
 	const { discoverModels } = await import("../src/provider.ts");
 	const models = await discoverModels(
 		{ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" },
-		{ onlyShowUsableModels: false, showGlobalRoutingModels: false, includeModels: [], excludeModels: [], syncOnStartup: true, modelCacheTtlMinutes: 60, autoSyncIntervalSeconds: 300, showGatewayTokensPerSecond: true, lastSuccessfulSyncAt: 0, onUnreachable: "none", fallbackModel: "", serverUrl: "http://localhost:20128", providerName: "omni", apiKey: "secret" },
+		{
+			onlyShowUsableModels: false,
+			showGlobalRoutingModels: false,
+			includeModels: [],
+			excludeModels: [],
+			syncOnStartup: true,
+			modelCacheTtlMinutes: 60,
+			autoSyncIntervalSeconds: 300,
+			showGatewayTokensPerSecond: true,
+			lastSuccessfulSyncAt: 0,
+			onUnreachable: "none",
+			fallbackModel: "",
+			serverUrl: "http://localhost:20128",
+			providerName: "omni",
+			apiKey: "secret",
+		},
 	);
 
 	for (const id of ["image-only", "attachment-capability", "pdf-capability", "video-capability"]) {
-		expect(models.find((model) => model.id === id)?.input).toEqual(["text", "image"]);
+		expect(models.find(model => model.id === id)?.input).toEqual(["text", "image"]);
 	}
-	expect(models.some((model) => model.id === "pdf-type")).toBe(false);
+	expect(models.some(model => model.id === "pdf-type")).toBe(false);
 });
 
 it("keeps advertised models when usable-provider verification fails", async () => {
-	fetchStub.mockImplementation(async (input) => {
+	fetchStub.mockImplementation(async input => {
 		const url = String(input);
 		if (url.endsWith("/v1/models")) {
 			return new Response(JSON.stringify({ data: [{ id: "openai/gpt-5", name: "GPT-5" }] }), { status: 200 });
@@ -343,9 +440,24 @@ it("keeps advertised models when usable-provider verification fails", async () =
 	const { discoverModels } = await import("../src/provider.ts");
 	const models = await discoverModels(
 		{ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" },
-		{ onlyShowUsableModels: true, showGlobalRoutingModels: false, includeModels: [], excludeModels: [], syncOnStartup: true, modelCacheTtlMinutes: 60, autoSyncIntervalSeconds: 300, showGatewayTokensPerSecond: true, lastSuccessfulSyncAt: 0, onUnreachable: "none", fallbackModel: "", serverUrl: "http://localhost:20128", providerName: "omni", apiKey: "secret" },
+		{
+			onlyShowUsableModels: true,
+			showGlobalRoutingModels: false,
+			includeModels: [],
+			excludeModels: [],
+			syncOnStartup: true,
+			modelCacheTtlMinutes: 60,
+			autoSyncIntervalSeconds: 300,
+			showGatewayTokensPerSecond: true,
+			lastSuccessfulSyncAt: 0,
+			onUnreachable: "none",
+			fallbackModel: "",
+			serverUrl: "http://localhost:20128",
+			providerName: "omni",
+			apiKey: "secret",
+		},
 	);
-	const model = models.find((entry) => entry.id === "openai/gpt-5");
+	const model = models.find(entry => entry.id === "openai/gpt-5");
 	expect(model).toBeDefined();
 	expect(model?.omitMaxOutputTokens).toBe(true);
 	expect(model?.compat?.supportsMaxOutputTokens).toBe(false);
@@ -353,27 +465,33 @@ it("keeps advertised models when usable-provider verification fails", async () =
 });
 
 it("discovers models from custom providers with custom prefix when onlyShowUsableModels is true", async () => {
-	fetchStub.mockImplementation(async (input) => {
+	fetchStub.mockImplementation(async input => {
 		const url = String(input);
 		if (url.endsWith("/v1/models")) {
-			return new Response(JSON.stringify({
-				data: [
-					{ id: "cosmoshub/qwen-3.7-max", name: "Qwen 3.7 Max" },
-					{ id: "unusable/some-model", name: "Unusable" },
-				],
-			}), { status: 200 });
+			return new Response(
+				JSON.stringify({
+					data: [
+						{ id: "cosmoshub/qwen-3.7-max", name: "Qwen 3.7 Max" },
+						{ id: "unusable/some-model", name: "Unusable" },
+					],
+				}),
+				{ status: 200 },
+			);
 		}
 		if (url.includes("/api/providers")) {
-			return new Response(JSON.stringify({
-				connections: [
-					{
-						provider: "openai-compatible-chat-uuid-1",
-						isActive: true,
-						testStatus: "active",
-						providerSpecificData: { prefix: "cosmoshub" },
-					},
-				],
-			}), { status: 200 });
+			return new Response(
+				JSON.stringify({
+					connections: [
+						{
+							provider: "openai-compatible-chat-uuid-1",
+							isActive: true,
+							testStatus: "active",
+							providerSpecificData: { prefix: "cosmoshub" },
+						},
+					],
+				}),
+				{ status: 200 },
+			);
 		}
 		if (url.includes("/api/pricing/models")) {
 			return new Response(JSON.stringify({}), { status: 200 });
@@ -387,9 +505,24 @@ it("discovers models from custom providers with custom prefix when onlyShowUsabl
 	const { discoverModels } = await import("../src/provider.ts");
 	const models = await discoverModels(
 		{ serverUrl: "http://localhost:20128", apiKey: "secret", providerName: "omni" },
-		{ onlyShowUsableModels: true, showGlobalRoutingModels: false, includeModels: [], excludeModels: [], syncOnStartup: true, modelCacheTtlMinutes: 60, autoSyncIntervalSeconds: 300, showGatewayTokensPerSecond: true, lastSuccessfulSyncAt: 0, onUnreachable: "none", fallbackModel: "", serverUrl: "http://localhost:20128", providerName: "omni", apiKey: "secret" },
+		{
+			onlyShowUsableModels: true,
+			showGlobalRoutingModels: false,
+			includeModels: [],
+			excludeModels: [],
+			syncOnStartup: true,
+			modelCacheTtlMinutes: 60,
+			autoSyncIntervalSeconds: 300,
+			showGatewayTokensPerSecond: true,
+			lastSuccessfulSyncAt: 0,
+			onUnreachable: "none",
+			fallbackModel: "",
+			serverUrl: "http://localhost:20128",
+			providerName: "omni",
+			apiKey: "secret",
+		},
 	);
 
-	expect(models.some((model) => model.id === "cosmoshub/qwen-3.7-max")).toBe(true);
-	expect(models.some((model) => model.id === "unusable/some-model")).toBe(false);
+	expect(models.some(model => model.id === "cosmoshub/qwen-3.7-max")).toBe(true);
+	expect(models.some(model => model.id === "unusable/some-model")).toBe(false);
 });

@@ -4,7 +4,14 @@ import { AUTO_MODELS } from "./provider.ts";
 
 export type KeyMatcher = (data: string, key: string) => boolean;
 export type ConfigDialogTab = "summary" | "config";
-type EditingField = "serverUrl" | "includeModels" | "excludeModels" | "modelCacheTtlMinutes" | "autoSyncIntervalSeconds" | "fallbackModel" | "apiKey";
+type EditingField =
+	| "serverUrl"
+	| "includeModels"
+	| "excludeModels"
+	| "modelCacheTtlMinutes"
+	| "autoSyncIntervalSeconds"
+	| "fallbackModel"
+	| "apiKey";
 
 export interface ModelSummary {
 	total: number;
@@ -22,13 +29,15 @@ export interface SyncResult {
 }
 
 export function summarizeModels(models: ProviderModelConfig[]): ModelSummary {
-	const contexts = models.map((model) => model.contextWindow).filter((value) => value > 0);
+	const contexts = models.map(model => model.contextWindow).filter(value => value > 0);
 	return {
 		total: models.length,
-		auto: models.filter((model) => AUTO_MODELS.includes(model.id)).length,
-		providerGroups: new Set(models.filter((model) => !AUTO_MODELS.includes(model.id)).map((model) => model.id.split("/")[0])).size,
-		reasoning: models.filter((model) => model.reasoning).length,
-		vision: models.filter((model) => model.input.includes("image")).length,
+		auto: models.filter(model => AUTO_MODELS.includes(model.id)).length,
+		providerGroups: new Set(
+			models.filter(model => !AUTO_MODELS.includes(model.id)).map(model => model.id.split("/")[0]),
+		).size,
+		reasoning: models.filter(model => model.reasoning).length,
+		vision: models.filter(model => model.input.includes("image")).length,
 		minContext: contexts.length ? Math.min(...contexts) : 0,
 		maxContext: contexts.length ? Math.max(...contexts) : 0,
 	};
@@ -41,7 +50,7 @@ function visibleWidth(value: string): number {
 function clip(value: string, width: number): string {
 	let visible = 0;
 	let result = "";
-	for (let index = 0; index < value.length && visible < width; ) {
+	for (let index = 0; index < value.length && visible < width;) {
 		const ansi = value.slice(index).match(/^\u001b\[[0-9;]*m/);
 		if (ansi) {
 			result += ansi[0];
@@ -118,8 +127,10 @@ export class ConfigDialog implements OmniComponent {
 			if (this.tab === "config" && [2, 3, 6, 9, 11].includes(this.selected)) this.toggleSelectedBoolean();
 			return;
 		}
-		if (this.matchesKey(data, "left") || this.matchesKey(data, "shift+tab") || this.matchesKey(data, "[")) return this.switchTab("summary");
-		if (this.matchesKey(data, "right") || this.matchesKey(data, "tab") || this.matchesKey(data, "]")) return this.switchTab("config");
+		if (this.matchesKey(data, "left") || this.matchesKey(data, "shift+tab") || this.matchesKey(data, "["))
+			return this.switchTab("summary");
+		if (this.matchesKey(data, "right") || this.matchesKey(data, "tab") || this.matchesKey(data, "]"))
+			return this.switchTab("config");
 		if (this.matchesKey(data, "up") || this.matchesKey(data, "k")) return this.move(-1);
 		if (this.matchesKey(data, "down") || this.matchesKey(data, "j")) return this.move(1);
 		if (this.matchesKey(data, "s") && this.tab === "summary") return this.sync();
@@ -131,14 +142,20 @@ export class ConfigDialog implements OmniComponent {
 		const inner = width - 2;
 		const border = "─".repeat(inner);
 		const tab = (id: ConfigDialogTab, label: string) =>
-			this.tab === id ? this.theme.fg("accent", this.theme.bold(`[ ${label} ]`)) : this.theme.fg("muted", `  ${label}  `);
-		const body = this.editing ? this.editorLines() : this.tab === "summary" ? this.summaryLines() : this.configLines();
+			this.tab === id
+				? this.theme.fg("accent", this.theme.bold(`[ ${label} ]`))
+				: this.theme.fg("muted", `  ${label}  `);
+		const body = this.editing
+			? this.editorLines()
+			: this.tab === "summary"
+				? this.summaryLines()
+				: this.configLines();
 		return [
 			`┌${border}┐`,
 			frameLine(` ${this.theme.fg("accent", this.theme.bold("OmniRoute"))}  Configuration`, width),
 			frameLine(` ${tab("summary", "Summary")} ${tab("config", "Config")}`, width),
 			`├${border}┤`,
-			...body.map((line) => frameLine(` ${line}`, width)),
+			...body.map(line => frameLine(` ${line}`, width)),
 			`├${border}┤`,
 			frameLine(` ${this.theme.fg(this.summaryError ? "error" : "dim", this.status)}`, width),
 			frameLine(` ${this.theme.fg("dim", this.footerHelp())}`, width),
@@ -160,7 +177,10 @@ export class ConfigDialog implements OmniComponent {
 			return;
 		}
 		if (this.editing === "includeModels" || this.editing === "excludeModels") {
-			this.draft[this.editing] = value.split(",").map((pattern) => pattern.trim()).filter(Boolean);
+			this.draft[this.editing] = value
+				.split(",")
+				.map(pattern => pattern.trim())
+				.filter(Boolean);
 		} else if (this.editing === "modelCacheTtlMinutes") {
 			const ttl = Number(value);
 			if (!Number.isFinite(ttl) || ttl < 0) {
@@ -194,7 +214,10 @@ export class ConfigDialog implements OmniComponent {
 	private switchTab(tab: ConfigDialogTab): void {
 		this.tab = tab;
 		this.selected = 0;
-		this.status = tab === "summary" ? "Live catalog loaded without changing synced models." : "Edit freely; Escape saves all changes and closes.";
+		this.status =
+			tab === "summary"
+				? "Live catalog loaded without changing synced models."
+				: "Edit freely; Escape saves all changes and closes.";
 	}
 
 	private move(delta: number): void {
@@ -208,8 +231,10 @@ export class ConfigDialog implements OmniComponent {
 		if ([2, 3, 6, 9, 11].includes(this.selected)) return this.toggleSelectedBoolean();
 		if (this.selected === 4) return this.startEditing("includeModels", this.draft.includeModels.join(", "));
 		if (this.selected === 5) return this.startEditing("excludeModels", this.draft.excludeModels.join(", "));
-		if (this.selected === 7) return this.startEditing("modelCacheTtlMinutes", String(this.draft.modelCacheTtlMinutes));
-		if (this.selected === 8) return this.startEditing("autoSyncIntervalSeconds", String(this.draft.autoSyncIntervalSeconds));
+		if (this.selected === 7)
+			return this.startEditing("modelCacheTtlMinutes", String(this.draft.modelCacheTtlMinutes));
+		if (this.selected === 8)
+			return this.startEditing("autoSyncIntervalSeconds", String(this.draft.autoSyncIntervalSeconds));
 		if (this.selected === 10) return this.startEditing("fallbackModel", this.draft.fallbackModel);
 		if (this.selected === 12) return this.startEditing("apiKey", "");
 		if (this.selected === 13) {
@@ -221,7 +246,7 @@ export class ConfigDialog implements OmniComponent {
 	private startEditing(field: EditingField, value: string): void {
 		this.editing = field;
 		this.input = this.createInput(value);
-		this.input.onSubmit = (submitted) => this.commitEditor(submitted);
+		this.input.onSubmit = submitted => this.commitEditor(submitted);
 		this.input.onEscape = () => this.cancelEditor();
 		this.status = "Enter commits this field · Escape cancels this field edit.";
 	}
@@ -254,7 +279,7 @@ export class ConfigDialog implements OmniComponent {
 	private sync(): void {
 		if (!this.onSync) return;
 		this.status = "Syncing models…";
-		void this.onSync().then((result) => {
+		void this.onSync().then(result => {
 			this.summary = result.summary ?? this.summary;
 			this.summaryError = result.error;
 			this.status = result.error ? `Sync failed: ${result.error}` : "Models synced successfully.";
@@ -274,7 +299,12 @@ export class ConfigDialog implements OmniComponent {
 	}
 
 	private summaryLines(): string[] {
-		if (!this.summary) return [this.theme.fg("error", `Live catalog unavailable: ${this.summaryError ?? "unknown error"}`), "", this.row(0, "Sync models", "Enter or s")];
+		if (!this.summary)
+			return [
+				this.theme.fg("error", `Live catalog unavailable: ${this.summaryError ?? "unknown error"}`),
+				"",
+				this.row(0, "Sync models", "Enter or s"),
+			];
 		return [
 			this.theme.bold("Live OmniRoute catalog"),
 			`Models             ${this.summary.total}`,
@@ -305,7 +335,11 @@ export class ConfigDialog implements OmniComponent {
 			this.theme.bold("Startup sync"),
 			this.row(6, "Sync stale models on startup", this.draft.syncOnStartup ? "on" : "off", true),
 			this.row(7, "Model cache TTL", `${this.draft.modelCacheTtlMinutes} minutes`),
-			this.row(8, "Auto-sync interval", this.draft.autoSyncIntervalSeconds === 0 ? "off" : `${this.draft.autoSyncIntervalSeconds} seconds`),
+			this.row(
+				8,
+				"Auto-sync interval",
+				this.draft.autoSyncIntervalSeconds === 0 ? "off" : `${this.draft.autoSyncIntervalSeconds} seconds`,
+			),
 			"",
 			this.theme.bold("Unreachable fallback"),
 			this.row(9, "On unreachable", this.draft.onUnreachable),
@@ -322,7 +356,9 @@ export class ConfigDialog implements OmniComponent {
 
 	private editorLines(): string[] {
 		const masked = this.editing === "apiKey";
-		const inputLine = masked ? `> ${"•".repeat(this.input?.getValue().length ?? 0)}` : (this.input?.render(70)[0] ?? ">");
+		const inputLine = masked
+			? `> ${"•".repeat(this.input?.getValue().length ?? 0)}`
+			: (this.input?.render(70)[0] ?? ">");
 		return [
 			this.theme.bold(masked ? "Replace API key" : `Edit ${this.editing}`),
 			"",
@@ -334,22 +370,24 @@ export class ConfigDialog implements OmniComponent {
 
 	private rowDescription(): string {
 		if (this.tab === "summary") return "Sync updates the persisted provider and model picker.";
-		return [
-			"Edit the server URL inline.",
-			"Provider name is read-only to avoid duplicate runtime providers.",
-			"Space or Enter switches between usable models and the full catalog.",
-			"Space or Enter shows or hides synthetic global routing models.",
-			"Comma-separated globs; non-matching models are hidden.",
-			"Comma-separated globs applied after include filters.",
-			"Sync once on startup when the cache is stale.",
-			"Minutes before startup considers the model cache stale; zero means always.",
-			"Seconds between background catalog refreshes; zero disables autosync.",
-			"Space or Enter switches between status-only and host-fallback behavior.",
-			"Host provider/id to select when OmniRoute is unreachable; empty means notify only.",
-			"Show or hide gateway-reported tok/s after OmniRoute turns.",
-			"Replace the API key in a masked inline editor.",
-			"Clear the API key in the draft.",
-		][this.selected] ?? "";
+		return (
+			[
+				"Edit the server URL inline.",
+				"Provider name is read-only to avoid duplicate runtime providers.",
+				"Space or Enter switches between usable models and the full catalog.",
+				"Space or Enter shows or hides synthetic global routing models.",
+				"Comma-separated globs; non-matching models are hidden.",
+				"Comma-separated globs applied after include filters.",
+				"Sync once on startup when the cache is stale.",
+				"Minutes before startup considers the model cache stale; zero means always.",
+				"Seconds between background catalog refreshes; zero disables autosync.",
+				"Space or Enter switches between status-only and host-fallback behavior.",
+				"Host provider/id to select when OmniRoute is unreachable; empty means notify only.",
+				"Show or hide gateway-reported tok/s after OmniRoute turns.",
+				"Replace the API key in a masked inline editor.",
+				"Clear the API key in the draft.",
+			][this.selected] ?? ""
+		);
 	}
 
 	private footerHelp(): string {

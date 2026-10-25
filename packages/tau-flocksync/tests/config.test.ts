@@ -2,7 +2,17 @@ import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { loadConfig, loadHopSettings, loadProbeConfig, loadSettings, sanitizeConfig, sanitizeSettings, saveConfig, settingsPath, type OmniSettings } from "../src/config.ts";
+import {
+	loadConfig,
+	loadHopSettings,
+	loadProbeConfig,
+	loadSettings,
+	sanitizeConfig,
+	sanitizeSettings,
+	saveConfig,
+	settingsPath,
+	type OmniSettings,
+} from "../src/config.ts";
 
 const origEnv = { ...process.env };
 beforeEach(() => {
@@ -36,12 +46,14 @@ describe("sanitizeConfig", () => {
 
 describe("sanitizeSettings", () => {
 	it("drops invalid array values and non-finite or negative timestamps", () => {
-		expect(sanitizeSettings({
-			includeModels: ["openai/*", 42] as string[],
-			excludeModels: [null, "*/legacy"] as string[],
-			modelCacheTtlMinutes: Number.NaN,
-			lastSuccessfulSyncAt: -1,
-		})).toMatchObject({
+		expect(
+			sanitizeSettings({
+				includeModels: ["openai/*", 42] as string[],
+				excludeModels: [null, "*/legacy"] as string[],
+				modelCacheTtlMinutes: Number.NaN,
+				lastSuccessfulSyncAt: -1,
+			}),
+		).toMatchObject({
 			includeModels: ["openai/*"],
 			excludeModels: ["*/legacy"],
 			modelCacheTtlMinutes: 60,
@@ -56,8 +68,12 @@ it("normalizes persisted auto-sync values at the settings boundary", () => {
 	expect(sanitizeSettings({ autoSyncIntervalSeconds: 0 })).toMatchObject({ autoSyncIntervalSeconds: 0 });
 	expect(sanitizeSettings({ autoSyncIntervalSeconds: -1 })).toMatchObject({ autoSyncIntervalSeconds: 300 });
 	expect(sanitizeSettings({ autoSyncIntervalSeconds: Number.NaN })).toMatchObject({ autoSyncIntervalSeconds: 300 });
-	expect(sanitizeSettings({ autoSyncIntervalSeconds: "12345" as unknown as number })).toMatchObject({ autoSyncIntervalSeconds: 300 });
-	expect(sanitizeSettings({ autoSyncIntervalMs: 120_000 } as Partial<OmniSettings> & { autoSyncIntervalMs: number })).toMatchObject({ autoSyncIntervalSeconds: 120 });
+	expect(sanitizeSettings({ autoSyncIntervalSeconds: "12345" as unknown as number })).toMatchObject({
+		autoSyncIntervalSeconds: 300,
+	});
+	expect(
+		sanitizeSettings({ autoSyncIntervalMs: 120_000 } as Partial<OmniSettings> & { autoSyncIntervalMs: number }),
+	).toMatchObject({ autoSyncIntervalSeconds: 120 });
 	expect(sanitizeSettings({ showGatewayTokensPerSecond: false }).showGatewayTokensPerSecond).toBe(false);
 });
 
@@ -116,7 +132,11 @@ describe("saveConfig", () => {
 
 		const settings = loadSettings(agentHome);
 		settings.onlyShowUsableModels = false;
-		saveConfig(agentHome, { serverUrl: "http://example.com/v1/", providerName: "custom", apiKey: "secret" }, settings);
+		saveConfig(
+			agentHome,
+			{ serverUrl: "http://example.com/v1/", providerName: "custom", apiKey: "secret" },
+			settings,
+		);
 
 		const path = settingsPath(agentHome);
 		expect(JSON.parse(readFileSync(path, "utf8"))).toEqual({
@@ -137,16 +157,22 @@ describe("saveConfig", () => {
 		});
 		expect(statSync(dirname(path)).mode & 0o777).toBe(0o700);
 		expect(statSync(path).mode & 0o777).toBe(0o600);
-		expect(loadConfig(agentHome)).toEqual({ serverUrl: "http://example.com", providerName: "custom", apiKey: "secret" });
+		expect(loadConfig(agentHome)).toEqual({
+			serverUrl: "http://example.com",
+			providerName: "custom",
+			apiKey: "secret",
+		});
 	});
 });
 
 describe("unreachable hop settings", () => {
 	it("accepts host-fallback and a host model id", () => {
-		expect(sanitizeSettings({
-			onUnreachable: "host-fallback",
-			fallbackModel: " anthropic/claude-sonnet-4 ",
-		})).toMatchObject({
+		expect(
+			sanitizeSettings({
+				onUnreachable: "host-fallback",
+				fallbackModel: " anthropic/claude-sonnet-4 ",
+			}),
+		).toMatchObject({
 			onUnreachable: "host-fallback",
 			fallbackModel: "anthropic/claude-sonnet-4",
 		});

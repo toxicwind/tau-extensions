@@ -24,9 +24,15 @@ const { MockInput, mockMatchesKey } = vi.hoisted(() => {
 				this.value += data;
 			}
 		}
-		setValue(val: string) { this.value = val; }
-		getValue() { return this.value; }
-		render(_width = 80): string[] { return [`> ${this.value}`]; }
+		setValue(val: string) {
+			this.value = val;
+		}
+		getValue() {
+			return this.value;
+		}
+		render(_width = 80): string[] {
+			return [`> ${this.value}`];
+		}
 	}
 	const keyMap: Record<string, string> = {
 		"\t": "tab",
@@ -37,17 +43,47 @@ const { MockInput, mockMatchesKey } = vi.hoisted(() => {
 		" ": "space",
 		"[": "[",
 		"]": "]",
-		"j": "j",
-		"k": "k",
-		"s": "s",
-		"q": "q",
-		"OVERLAP": "OVERLAP",
+		j: "j",
+		k: "k",
+		s: "s",
+		q: "q",
+		OVERLAP: "OVERLAP",
 	};
 	const matchesKey = (data: string, key: string) => {
-		if (key === "left") return data === "[" || data === "\u001b[D" || data === "\u001bOD" || data === "\u001b[57417u" || data === "\u001b[1;1D";
-		if (key === "right") return data === "\t" || data === "]" || data === "\u001b[C" || data === "\u001bOC" || data === "\u001b[57418u" || data === "\u001b[1;1C" || data === "\u001b[9u";
-		if (key === "up") return data === "k" || data === "\u001b[A" || data === "\u001bOA" || data === "\u001b[57419u" || data === "\u001b[1;1A";
-		if (key === "down") return data === "j" || data === "\u001b[B" || data === "\u001bOB" || data === "\u001b[57420u" || data === "\u001b[1;1B";
+		if (key === "left")
+			return (
+				data === "[" ||
+				data === "\u001b[D" ||
+				data === "\u001bOD" ||
+				data === "\u001b[57417u" ||
+				data === "\u001b[1;1D"
+			);
+		if (key === "right")
+			return (
+				data === "\t" ||
+				data === "]" ||
+				data === "\u001b[C" ||
+				data === "\u001bOC" ||
+				data === "\u001b[57418u" ||
+				data === "\u001b[1;1C" ||
+				data === "\u001b[9u"
+			);
+		if (key === "up")
+			return (
+				data === "k" ||
+				data === "\u001b[A" ||
+				data === "\u001bOA" ||
+				data === "\u001b[57419u" ||
+				data === "\u001b[1;1A"
+			);
+		if (key === "down")
+			return (
+				data === "j" ||
+				data === "\u001b[B" ||
+				data === "\u001bOB" ||
+				data === "\u001b[57420u" ||
+				data === "\u001b[1;1B"
+			);
 		if (key === "enter") return data === "\r" || data === "\u001b[13u";
 		if (key === "escape") return data === "\x1b" || data === "\u001b[27u" || data === "\u001b[27;1;27~";
 		if (key === "ctrl+c") return data === "\x03";
@@ -63,7 +99,7 @@ import { ConfigDialog, summarizeModels, type KeyMatcher } from "../src/config-di
 import type { OmniSettings } from "../src/config.ts";
 import type { OmniTheme, ProviderModelConfig } from "../src/contracts.ts";
 
-const theme: OmniTheme = { fg: (_color, text) => text, bold: (text) => text };
+const theme: OmniTheme = { fg: (_color, text) => text, bold: text => text };
 const matchKey: KeyMatcher = (data, key) => matchesKey(data, key as never);
 const baseSettings: OmniSettings = {
 	serverUrl: "http://127.0.0.1:20130",
@@ -104,12 +140,24 @@ function model(id: string, options: Partial<ProviderModelConfig> = {}): Provider
 	};
 }
 
-function dialog(done = vi.fn(), onSync?: () => Promise<{ summary?: ReturnType<typeof summarizeModels>; error?: string }>): ConfigDialog {
-	return new ConfigDialog({ ...baseSettings }, summarizeModels([model("auto")]), undefined, theme, done, matchKey, onSync, (initialValue) => {
-		const input = new Input();
-		if (initialValue) input.handleInput(initialValue);
-		return input;
-	});
+function dialog(
+	done = vi.fn(),
+	onSync?: () => Promise<{ summary?: ReturnType<typeof summarizeModels>; error?: string }>,
+): ConfigDialog {
+	return new ConfigDialog(
+		{ ...baseSettings },
+		summarizeModels([model("auto")]),
+		undefined,
+		theme,
+		done,
+		matchKey,
+		onSync,
+		initialValue => {
+			const input = new Input();
+			if (initialValue) input.handleInput(initialValue);
+			return input;
+		},
+	);
 }
 
 function goConfig(component: ConfigDialog): void {
@@ -123,7 +171,7 @@ function selectToggle(component: ConfigDialog): void {
 }
 
 function selectedLine(component: ConfigDialog): string {
-	return component.render(100).find((line) => line.includes("› ")) ?? "";
+	return component.render(100).find(line => line.includes("› ")) ?? "";
 }
 
 function rendered(component: ConfigDialog): string {
@@ -136,40 +184,58 @@ function visibleWidth(value: string): number {
 
 describe("model summary", () => {
 	it("summarizes groups and capabilities", () => {
-		expect(summarizeModels([
-			model("auto"),
-			model("openai/gpt-5", { reasoning: true, contextWindow: 400_000 }),
-			model("google/gemini", { input: ["text", "image"], contextWindow: 1_000_000 }),
-		])).toEqual({ total: 3, auto: 1, providerGroups: 2, reasoning: 1, vision: 1, minContext: 128_000, maxContext: 1_000_000 });
+		expect(
+			summarizeModels([
+				model("auto"),
+				model("openai/gpt-5", { reasoning: true, contextWindow: 400_000 }),
+				model("google/gemini", { input: ["text", "image"], contextWindow: 1_000_000 }),
+			]),
+		).toEqual({
+			total: 3,
+			auto: 1,
+			providerGroups: 2,
+			reasoning: 1,
+			vision: 1,
+			minContext: 128_000,
+			maxContext: 1_000_000,
+		});
 	});
 
 	it("handles an empty catalog", () => {
-		expect(summarizeModels([])).toEqual({ total: 0, auto: 0, providerGroups: 0, reasoning: 0, vision: 0, minContext: 0, maxContext: 0 });
+		expect(summarizeModels([])).toEqual({
+			total: 0,
+			auto: 0,
+			providerGroups: 0,
+			reasoning: 0,
+			vision: 0,
+			minContext: 0,
+			maxContext: 0,
+		});
 	});
 });
 
 describe("navigation", () => {
-	it.each([...RIGHT, "\t", "\x1b[9u"])("opens Config with %j", (key) => {
+	it.each([...RIGHT, "\t", "\x1b[9u"])("opens Config with %j", key => {
 		const component = dialog();
 		component.handleInput(key);
 		expect(rendered(component)).toContain("[ Config ]");
 	});
 
-	it.each(LEFT)("returns to Summary with %j", (key) => {
+	it.each(LEFT)("returns to Summary with %j", key => {
 		const component = dialog();
 		goConfig(component);
 		component.handleInput(key);
 		expect(rendered(component)).toContain("[ Summary ]");
 	});
 
-	it.each(DOWN)("moves down with %j", (key) => {
+	it.each(DOWN)("moves down with %j", key => {
 		const component = dialog();
 		goConfig(component);
 		component.handleInput(key);
 		expect(selectedLine(component)).toContain("Provider name");
 	});
 
-	it.each(UP)("moves up with %j", (key) => {
+	it.each(UP)("moves up with %j", key => {
 		const component = dialog();
 		selectToggle(component);
 		component.handleInput(key);
@@ -190,7 +256,7 @@ describe("navigation", () => {
 });
 
 describe("staged boolean control", () => {
-	it.each([...SPACE, ...ENTER])("toggles locally with %j without closing", (key) => {
+	it.each([...SPACE, ...ENTER])("toggles locally with %j without closing", key => {
 		const done = vi.fn();
 		const component = dialog(done);
 		selectToggle(component);
@@ -223,12 +289,22 @@ describe("staged boolean control", () => {
 
 	it("gives Space precedence over an overlapping Tab match", () => {
 		const done = vi.fn();
-		const overlap = (data: string, key: string) => matchKey(data, key) || (data === "OVERLAP" && (key === "space" || key === "tab"));
-		const component = new ConfigDialog({ ...baseSettings }, summarizeModels([]), undefined, theme, done, overlap, undefined, (initialValue) => {
-		const input = new Input();
-		if (initialValue) input.handleInput(initialValue);
-		return input;
-	});
+		const overlap = (data: string, key: string) =>
+			matchKey(data, key) || (data === "OVERLAP" && (key === "space" || key === "tab"));
+		const component = new ConfigDialog(
+			{ ...baseSettings },
+			summarizeModels([]),
+			undefined,
+			theme,
+			done,
+			overlap,
+			undefined,
+			initialValue => {
+				const input = new Input();
+				if (initialValue) input.handleInput(initialValue);
+				return input;
+			},
+		);
 		component.handleInput("]");
 		component.handleInput("j");
 		component.handleInput("j");
@@ -238,7 +314,7 @@ describe("staged boolean control", () => {
 		expect(done).not.toHaveBeenCalled();
 	});
 
-	it.each(SPACE)("Space is inert on non-boolean rows for %j", (key) => {
+	it.each(SPACE)("Space is inert on non-boolean rows for %j", key => {
 		const done = vi.fn();
 		const component = dialog(done);
 		goConfig(component);
@@ -273,7 +349,7 @@ describe("inline field editing", () => {
 		expect(rendered(component)).toContain("invalid");
 	});
 
-	it.each(ESCAPE)("Escape cancels only the active URL edit for %j", (key) => {
+	it.each(ESCAPE)("Escape cancels only the active URL edit for %j", key => {
 		const done = vi.fn();
 		const component = dialog(done);
 		goConfig(component);
@@ -285,7 +361,7 @@ describe("inline field editing", () => {
 		expect(done).not.toHaveBeenCalled();
 	});
 
-	it.each(BACKSPACE)("handles backspace encoding %j", (key) => {
+	it.each(BACKSPACE)("handles backspace encoding %j", key => {
 		const component = dialog();
 		goConfig(component);
 		component.handleInput("\r");
@@ -412,7 +488,7 @@ describe("save and cancel", () => {
 		expect(rendered(component)).toContain("[ Summary ]");
 	});
 
-	it.each(ESCAPE)("Escape outside editing returns the complete draft once for %j", (key) => {
+	it.each(ESCAPE)("Escape outside editing returns the complete draft once for %j", key => {
 		const done = vi.fn();
 		const component = dialog(done);
 		selectToggle(component);
@@ -479,15 +555,24 @@ describe("rendering", () => {
 	});
 
 	it("renders live-fetch errors", () => {
-		const component = new ConfigDialog({ ...baseSettings }, undefined, "offline", theme, vi.fn(), matchKey, undefined, (initialValue) => {
-		const input = new Input();
-		if (initialValue) input.handleInput(initialValue);
-		return input;
-	});
+		const component = new ConfigDialog(
+			{ ...baseSettings },
+			undefined,
+			"offline",
+			theme,
+			vi.fn(),
+			matchKey,
+			undefined,
+			initialValue => {
+				const input = new Input();
+				if (initialValue) input.handleInput(initialValue);
+				return input;
+			},
+		);
 		expect(rendered(component)).toContain("Live catalog unavailable: offline");
 	});
 
-	it.each([1, 10, 40, 80])("keeps each line within width %i", (width) => {
+	it.each([1, 10, 40, 80])("keeps each line within width %i", width => {
 		for (const line of dialog().render(width)) expect(visibleWidth(line)).toBeLessThanOrEqual(width);
 	});
 });

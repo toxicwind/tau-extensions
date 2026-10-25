@@ -41,7 +41,9 @@ describe("shouldAttemptHop", () => {
 	});
 
 	it("does not hop when the active model is already a non-omni host provider", () => {
-		expect(shouldAttemptHop({ ...hopBase, currentProvider: "anthropic", currentModelId: "claude-sonnet-4" })).toBe(false);
+		expect(shouldAttemptHop({ ...hopBase, currentProvider: "anthropic", currentModelId: "claude-sonnet-4" })).toBe(
+			false,
+		);
 	});
 
 	it("requires a parseable fallback model", () => {
@@ -75,12 +77,42 @@ describe("isOmniActiveModel and unreachable status", () => {
 	});
 
 	it("recognizes thrown OmniRoute timeout and connection failures only", () => {
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "fetch failed: ECONNREFUSED" }, "omni")).toBe(true);
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "Request timed out" }, "omni")).toBe(true);
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "Connection error." }, "omni")).toBe(true);
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "401: invalid API key" }, "omni")).toBe(false);
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "omni", stopReason: "aborted", errorMessage: "Request timed out" }, "omni")).toBe(false);
-		expect(isUnreachableRequestFailure({ role: "assistant", provider: "anthropic", stopReason: "error", errorMessage: "502: bad gateway" }, "omni")).toBe(false);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "fetch failed: ECONNREFUSED" },
+				"omni",
+			),
+		).toBe(true);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "Request timed out" },
+				"omni",
+			),
+		).toBe(true);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "Connection error." },
+				"omni",
+			),
+		).toBe(true);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "omni", stopReason: "error", errorMessage: "401: invalid API key" },
+				"omni",
+			),
+		).toBe(false);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "omni", stopReason: "aborted", errorMessage: "Request timed out" },
+				"omni",
+			),
+		).toBe(false);
+		expect(
+			isUnreachableRequestFailure(
+				{ role: "assistant", provider: "anthropic", stopReason: "error", errorMessage: "502: bad gateway" },
+				"omni",
+			),
+		).toBe(false);
 	});
 });
 
@@ -122,10 +154,12 @@ describe("hopOnUnreachable", () => {
 			modelRegistry: registry,
 		} as OmniContext;
 
-		expect(await hopOnUnreachable(
-			{ serverUrl: "http://localhost:20128" },
-			hopOptionsFromContext(context, hopBase, setModel),
-		)).toBe(true);
+		expect(
+			await hopOnUnreachable(
+				{ serverUrl: "http://localhost:20128" },
+				hopOptionsFromContext(context, hopBase, setModel),
+			),
+		).toBe(true);
 		expect(setModel).toHaveBeenCalledWith(fallback);
 	});
 
@@ -144,10 +178,7 @@ describe("hopOnUnreachable", () => {
 
 	it("does not invent a second omni provider when the host cannot switch", async () => {
 		const notify = vi.fn();
-		const hopped = await hopOnUnreachable(
-			{ serverUrl: "http://gateway.example" },
-			{ ...hopBase, notify },
-		);
+		const hopped = await hopOnUnreachable({ serverUrl: "http://gateway.example" }, { ...hopBase, notify });
 		expect(hopped).toBe(false);
 		expect(notify).toHaveBeenCalledWith(
 			"OmniRoute unreachable at http://gateway.example. Host fallback anthropic/claude-sonnet-4 is unavailable. Use /model anthropic/claude-sonnet-4.",
@@ -191,15 +222,13 @@ describe("createUnreachableController", () => {
 		expect(first).toEqual({ ok: true, unreachable: false });
 		expect(second).toEqual({ ok: true, unreachable: false });
 		expect(fetchStub).toHaveBeenCalledTimes(1);
-		expect(fetchStub).toHaveBeenCalledWith(
-			"http://configured.example/api/health/ping",
-			expect.objectContaining({}),
-		);
+		expect(fetchStub).toHaveBeenCalledWith("http://configured.example/api/health/ping", expect.objectContaining({}));
 		fetchStub.mockRestore();
 	});
 
 	it("forces a fresh probe when the success cache is warm", async () => {
-		const fetchStub = vi.spyOn(globalThis, "fetch")
+		const fetchStub = vi
+			.spyOn(globalThis, "fetch")
 			.mockResolvedValueOnce(new Response(null, { status: 200 }))
 			.mockResolvedValueOnce(new Response(null, { status: 200 }));
 		const controller = createUnreachableController();

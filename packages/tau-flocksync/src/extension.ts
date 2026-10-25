@@ -15,7 +15,18 @@ import {
 } from "./config.ts";
 import { ConfigDialog, summarizeModels, type ModelSummary } from "./config-dialog.ts";
 import type { AgentHomeOptions, OmniContext, OmniPI, ProviderModelConfig } from "./contracts.ts";
-import { AUTO_MODELS, checkModelsEndpoint, discoverModels, isSyncStale, probeHealth, registerOmniProvider, reloadOmniProvider, setInferenceApi, testChat, transformProviderPayload } from "./provider.ts";
+import {
+	AUTO_MODELS,
+	checkModelsEndpoint,
+	discoverModels,
+	isSyncStale,
+	probeHealth,
+	registerOmniProvider,
+	reloadOmniProvider,
+	setInferenceApi,
+	testChat,
+	transformProviderPayload,
+} from "./provider.ts";
 import { registerGatewayTelemetry } from "./gateway-telemetry.ts";
 import {
 	createUnreachableController,
@@ -34,12 +45,16 @@ function sortKey(id: string): string {
 function modelLines(models: ProviderModelConfig[], query = "", limit = 80): string[] {
 	const normalizedQuery = query.toLowerCase();
 	const filtered = normalizedQuery
-		? models.filter((model) => `${model.id} ${model.name}`.toLowerCase().includes(normalizedQuery))
+		? models.filter(model => `${model.id} ${model.name}`.toLowerCase().includes(normalizedQuery))
 		: models;
 	const sorted = [...filtered].sort((a, b) => sortKey(a.id).localeCompare(sortKey(b.id)) || a.id.localeCompare(b.id));
 	const groups = new Map<string, ProviderModelConfig[]>();
 	for (const model of sorted) {
-		const group = AUTO_MODELS.includes(model.id) ? "auto" : model.id.includes("/") ? model.id.split("/")[0] : "direct";
+		const group = AUTO_MODELS.includes(model.id)
+			? "auto"
+			: model.id.includes("/")
+				? model.id.split("/")[0]
+				: "direct";
 		groups.set(group, [...(groups.get(group) ?? []), model]);
 	}
 	const entries = [...groups].sort(([a], [b]) => (a === "auto" ? -1 : b === "auto" ? 1 : a.localeCompare(b)));
@@ -139,30 +154,48 @@ async function showConfigDialog(
 
 	const storedSettings = loadSettings(agentHome);
 	const settings: OmniSettings = { ...storedSettings, ...loadHopSettings(agentHome) };
-	const saved = await ctx.ui.custom<OmniSettings | undefined>((tui, theme, _keybindings, done) => {
-		const sync = async () => {
-			try {
-				const models = await registerOmniProvider(pi, agentHome, loadConfig(agentHome), loadSettings(agentHome), ctx.signal);
-				return { summary: summarizeModels(models) };
-			} catch (error) {
-				return { error: (error as Error).message };
-			} finally {
-				tui.requestRender();
-			}
-		};
-		const dialog = new ConfigDialog(settings, summary, summaryError, theme, done, options.matchesKey, sync, options.createInput);
-		return {
-			render: (width) => dialog.render(width),
-			invalidate: () => dialog.invalidate(),
-			handleInput: (data) => {
-				dialog.handleInput(data);
-				tui.requestRender();
-			},
-		};
-	}, {
-		overlay: true,
-		overlayOptions: { width: "80%", minWidth: 60, anchor: "center", margin: 2 },
-	});
+	const saved = await ctx.ui.custom<OmniSettings | undefined>(
+		(tui, theme, _keybindings, done) => {
+			const sync = async () => {
+				try {
+					const models = await registerOmniProvider(
+						pi,
+						agentHome,
+						loadConfig(agentHome),
+						loadSettings(agentHome),
+						ctx.signal,
+					);
+					return { summary: summarizeModels(models) };
+				} catch (error) {
+					return { error: (error as Error).message };
+				} finally {
+					tui.requestRender();
+				}
+			};
+			const dialog = new ConfigDialog(
+				settings,
+				summary,
+				summaryError,
+				theme,
+				done,
+				options.matchesKey,
+				sync,
+				options.createInput,
+			);
+			return {
+				render: width => dialog.render(width),
+				invalidate: () => dialog.invalidate(),
+				handleInput: data => {
+					dialog.handleInput(data);
+					tui.requestRender();
+				},
+			};
+		},
+		{
+			overlay: true,
+			overlayOptions: { width: "80%", minWidth: 60, anchor: "center", margin: 2 },
+		},
+	);
 	if (!saved) return;
 
 	const persisted: OmniSettings = { ...saved };
@@ -282,7 +315,7 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 		const intervalSeconds = loadSettings(agentHome).autoSyncIntervalSeconds;
 		if (intervalSeconds === 0) return;
 		autoSyncTimer = setInterval(() => {
-			void sync(undefined, { quiet: true }).catch((error) => {
+			void sync(undefined, { quiet: true }).catch(error => {
 				sessionCtx?.ui.notify(`OmniRoute auto-sync failed: ${(error as Error).message}`, "warning");
 			});
 		}, intervalSeconds * 1000);
@@ -303,7 +336,11 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 			try {
 				lastSyncCount = (await registerOmniProvider(pi, agentHome, config, settings, ctx.signal)).length;
 			} catch (error) {
-				if (ctx.hasUI) ctx.ui.notify(`OmniRoute startup sync failed; using previous models: ${(error as Error).message}`, "warning");
+				if (ctx.hasUI)
+					ctx.ui.notify(
+						`OmniRoute startup sync failed; using previous models: ${(error as Error).message}`,
+						"warning",
+					);
 			}
 		}
 		if (!isConfigured(agentHome) && !process.env.OMNIROUTE_URL) {
@@ -328,7 +365,9 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 		}
 		if (healthTimer) clearInterval(healthTimer);
 		healthTimer = setInterval(async () => {
-			const next = await unreachable.probe(loadProbeConfig(agentHome), healthProbeAbortController?.signal).catch(() => undefined);
+			const next = await unreachable
+				.probe(loadProbeConfig(agentHome), healthProbeAbortController?.signal)
+				.catch(() => undefined);
 			if (next) ctx.ui.setStatus("omni", healthStatus(next));
 		}, 60_000);
 	});
@@ -379,12 +418,16 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 			return;
 		}
 		const probeConfig = loadProbeConfig(agentHome);
-		const lastAssistant = [...event.messages].reverse().find((message) => message.role === "assistant");
+		const lastAssistant = [...event.messages].reverse().find(message => message.role === "assistant");
 		if (isUnreachableRequestFailure(lastAssistant, probeConfig.providerName)) {
 			pendingRequestFailure = true;
 			return;
 		}
-		if (lastAssistant?.role === "assistant" && lastAssistant.stopReason !== "error" && lastAssistant.stopReason !== "aborted") {
+		if (
+			lastAssistant?.role === "assistant" &&
+			lastAssistant.stopReason !== "error" &&
+			lastAssistant.stopReason !== "aborted"
+		) {
 			pendingRequestFailure = false;
 		}
 	});
@@ -437,9 +480,9 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 		label: "flocksync Status",
 		description: "Return flocksync / OmniRoute health and provider registration status.",
 		parameters: { type: "object", properties: {} },
-		execute: (id, params, signal) => pi.tools.get?.("omniroute_status")?.execute(id, params, signal) ?? Promise.resolve({ content: [] }),
+		execute: (id, params, signal) =>
+			pi.tools.get?.("omniroute_status")?.execute(id, params, signal) ?? Promise.resolve({ content: [] }),
 	});
-
 
 	pi.registerTool({
 		name: "omniroute_sync",
@@ -460,16 +503,16 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 		label: "flocksync Sync",
 		description: "Fetch /v1/models from flocksync / OmniRoute and register them as a provider.",
 		parameters: { type: "object", properties: {} },
-		execute: (id, params, signal) => pi.tools.get?.("omniroute_sync")?.execute(id, params, signal) ?? Promise.resolve({ content: [] }),
+		execute: (id, params, signal) =>
+			pi.tools.get?.("omniroute_sync")?.execute(id, params, signal) ?? Promise.resolve({ content: [] }),
 	});
-
 
 	pi.registerCommand("omni", {
 		description: "OmniRoute: /omni [setup|sync|models|test|dashboard|config|autosync|help]",
 		getArgumentCompletions(prefix) {
 			return ["setup", "sync", "models", "test", "dashboard", "config", "autosync", "help"]
-				.filter((value) => value.startsWith(prefix))
-				.map((value) => ({ value, label: value }));
+				.filter(value => value.startsWith(prefix))
+				.map(value => ({ value, label: value }));
 		},
 		async handler(args, ctx) {
 			if (!ctx.hasUI) return;
@@ -490,7 +533,7 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 				}
 				if (sub === "sync") return void (await sync(ctx));
 				if (sub === "models") {
-					const models = await discoverModels(config, loadSettings(agentHome), ctx.signal).catch((error) => {
+					const models = await discoverModels(config, loadSettings(agentHome), ctx.signal).catch(error => {
 						if (ctx.signal?.aborted) throw error;
 						return [];
 					});
@@ -529,10 +572,14 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 						const value = Number(arg);
 						if (Number.isSafeInteger(value)) seconds = value;
 					}
-					if (seconds === undefined) return ctx.ui.notify("Usage: /omni autosync [status|on|off|<seconds>]", "warning");
+					if (seconds === undefined)
+						return ctx.ui.notify("Usage: /omni autosync [status|on|off|<seconds>]", "warning");
 					saveSettings(agentHome, { ...settings, autoSyncIntervalSeconds: Math.floor(seconds) });
 					startAutoSync(ctx);
-					return ctx.ui.notify(`OmniRoute auto-sync ${seconds === 0 ? "disabled" : `set to every ${seconds}s`}.`, "info");
+					return ctx.ui.notify(
+						`OmniRoute auto-sync ${seconds === 0 ? "disabled" : `set to every ${seconds}s`}.`,
+						"info",
+					);
 				}
 				ctx.ui.notify(`Unknown /omni command '${sub}'.\n\n${helpText()}`, "warning");
 			} catch (error) {
@@ -544,8 +591,8 @@ export async function createOmniExtension(pi: OmniPI, options: AgentHomeOptions)
 		description: "flocksync: /flocksync [setup|sync|models|test|dashboard|config|autosync|help]",
 		getArgumentCompletions(prefix) {
 			return ["setup", "sync", "models", "test", "dashboard", "config", "autosync", "help"]
-				.filter((value) => value.startsWith(prefix))
-				.map((value) => ({ value, label: value }));
+				.filter(value => value.startsWith(prefix))
+				.map(value => ({ value, label: value }));
 		},
 		async handler(args, ctx) {
 			const omniCmd = pi.commands.get("omni");

@@ -56,7 +56,9 @@ describe("gateway tok/s", () => {
 
 	it("does not invent tok/s from latency", () => {
 		expect(tokensPerSecondFromUsage({ output: 200, latency_ms: 2000 })).toBeUndefined();
-		expect(parseOmniRouteToksHeader(new Headers({ "X-OmniRoute-Latency-Ms": "2000", "X-OmniRoute-Tokens-Out": "200" }))).toBeUndefined();
+		expect(
+			parseOmniRouteToksHeader(new Headers({ "X-OmniRoute-Latency-Ms": "2000", "X-OmniRoute-Tokens-Out": "200" })),
+		).toBeUndefined();
 		expect(formatGatewayTokensPerSecond(undefined)).toBe("—");
 	});
 
@@ -65,7 +67,7 @@ describe("gateway tok/s", () => {
 			headers: { "content-type": "text/event-stream" },
 		});
 		let captured: number | undefined;
-		await captureTokensPerSecondFromResponse(commentResponse, (tps) => {
+		await captureTokensPerSecondFromResponse(commentResponse, tps => {
 			captured = tps;
 		});
 		expect(captured).toBe(12.5);
@@ -74,7 +76,7 @@ describe("gateway tok/s", () => {
 			headers: { "content-type": "application/json" },
 		});
 		captured = undefined;
-		await captureTokensPerSecondFromResponse(usageResponse, (tps) => {
+		await captureTokensPerSecondFromResponse(usageResponse, tps => {
 			captured = tps;
 		});
 		expect(captured).toBe(80.5);
@@ -82,7 +84,9 @@ describe("gateway tok/s", () => {
 
 	it("only treats OmniRoute inference endpoints as telemetry sources", () => {
 		expect(isOmniRouteInferenceRequest("https://gateway.example/v1/responses", "https://gateway.example")).toBe(true);
-		expect(isOmniRouteInferenceRequest("https://gateway.example/v1/chat/completions", "https://gateway.example")).toBe(true);
+		expect(
+			isOmniRouteInferenceRequest("https://gateway.example/v1/chat/completions", "https://gateway.example"),
+		).toBe(true);
 		expect(isOmniRouteInferenceRequest("https://gateway.example/v1/models", "https://gateway.example")).toBe(false);
 		expect(isOmniRouteInferenceRequest("https://other.example/v1/responses", "https://gateway.example")).toBe(false);
 	});
@@ -91,7 +95,7 @@ describe("gateway tok/s", () => {
 		const inner: typeof fetch = async () =>
 			new Response("{}", { headers: { "X-OmniRoute-Tokens-Per-Second": "40" } });
 		let captured: number | undefined;
-		const wrapped = wrapFetchCaptureTokensPerSecond(inner, (tps) => {
+		const wrapped = wrapFetchCaptureTokensPerSecond(inner, tps => {
 			captured = tps;
 		});
 		const response = await wrapped("https://gateway.example/v1/chat/completions");
@@ -108,7 +112,7 @@ describe("gateway tok/s", () => {
 			})) as typeof fetch;
 		const sessionFetch = globalThis.fetch;
 		let notified: string | undefined;
-		const uiContext = context("omni", (message) => {
+		const uiContext = context("omni", message => {
 			notified = message;
 		});
 		try {
@@ -129,7 +133,7 @@ describe("gateway tok/s", () => {
 		const originalFetch = globalThis.fetch;
 		const { handlers } = fakePi();
 		let notified: string | undefined;
-		const uiContext = context("omni", (message) => {
+		const uiContext = context("omni", message => {
 			notified = message;
 		});
 		try {
@@ -158,7 +162,7 @@ describe("gateway tok/s", () => {
 				: new Response("{}", { headers: { "content-type": "application/json" } });
 		}) as typeof fetch;
 		let notified: string | undefined;
-		const uiContext = context("omni", (message) => {
+		const uiContext = context("omni", message => {
 			notified = message;
 		});
 		try {
@@ -197,7 +201,7 @@ describe("gateway tok/s", () => {
 		globalThis.fetch = (async () =>
 			new Response("{}", { headers: { "X-OmniRoute-Tokens-Per-Second": "40" } })) as typeof fetch;
 		let notified: string | undefined;
-		const uiContext = context("codex", (message) => {
+		const uiContext = context("codex", message => {
 			notified = message;
 		});
 		try {

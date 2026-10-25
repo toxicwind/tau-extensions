@@ -9,7 +9,7 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 		defaultHome: "~/.tau/agent",
 		inferenceApi: "openai-responses",
 		matchesKey,
-		createInput: (initialValue) => {
+		createInput: initialValue => {
 			const input = new Input();
 			if (initialValue) input.handleInput(initialValue);
 			return input;
