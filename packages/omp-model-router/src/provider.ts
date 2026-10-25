@@ -11,10 +11,10 @@ import { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream"
 import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import { clampThinkingLevelForModel } from "@oh-my-pi/pi-catalog/model-thinking";
 import type { Effort } from "@oh-my-pi/pi-catalog/effort";
-import type {
+import type { 
 	ExtensionAPI,
 	ExtensionContext,
-} from "@tau/tau-agent";
+} from "@tau/tau-agent-core";
 import type { RoutingDecision } from "./types";
 import { profileNames, parseCanonicalModelRef, ROUTER_TIERS, resolveProfileForTaskType } from "./config";
 import { resolveEffectivePin, setScopedPin } from "./routing/pin";

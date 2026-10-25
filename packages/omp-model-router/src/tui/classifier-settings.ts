@@ -1,6 +1,6 @@
 import type { Component, TUI } from "@oh-my-pi/pi-tui";
 import { Input, replaceTabs, truncateToWidth, matchesKey } from "@oh-my-pi/pi-tui";
-import type { KeybindingsManager, ModelRegistry, Theme } from "@tau/tau-agent";
+import type { KeybindingsManager, ModelRegistry, Theme } from "@tau/tau-agent-core";
 import type { CalibrationConfig } from "../calibration/types";
 import { ModelPickerComponent } from "./model-picker";
 

@@ -1,6 +1,6 @@
 import type { Component, TUI } from "@oh-my-pi/pi-tui";
 import { replaceTabs, truncateToWidth, matchesKey } from "@oh-my-pi/pi-tui";
-import type { KeybindingsManager, Theme, ModelRegistry } from "@tau/tau-agent";
+import type { KeybindingsManager, Theme, ModelRegistry } from "@tau/tau-agent-core";
 import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import type { RouterProfile, RouterTier } from "../types";
 import { ModelPickerComponent } from "./model-picker";
@@ -496,7 +496,7 @@ export function createProfileEditorFactory(
 
 // ─── CRUD Helper Functions ────────────────────────────────────────────────────
 
-import type { ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterConfig } from "../types";
 import { patchConfigFile, profileNames } from "../config";
 

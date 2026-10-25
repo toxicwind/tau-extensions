@@ -31,10 +31,10 @@
  * returns a string and a `MessageMeta` blob the extension uses to render
  * the in-TUI commit badge.
  */
-import type {
+import type { 
 	EditToolDetails,
 	EditToolPerFileResult,
-} from "@tau/tau-agent";
+} from "@tau/tau-agent-core";
 
 /** Lightweight handle to the parts of a diff we care about. */
 export interface DiffSummary {

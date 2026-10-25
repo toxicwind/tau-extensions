@@ -1,9 +1,9 @@
 import type { SessionCalibration } from "../calibration/types";
-import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent-core";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import type {
+import type { 
 	RouterConfig,
 	RouterThinkingByProfile,
 	RouterTier,

@@ -1,4 +1,4 @@
-import type { ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterState } from "../state";
 import type { Actions } from "./shared";
 

@@ -10,7 +10,7 @@
  * See: https://github.com/rtk-ai/rtk
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterState } from "./state";
 
 type ToolCallEvent = {

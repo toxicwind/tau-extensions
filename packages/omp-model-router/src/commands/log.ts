@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, basename, dirname, sep } from "node:path";
 import { homedir } from "node:os";
-import type { ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterState } from "../state";
 import type { PromptLogRecord } from "../calibration/trace";
 import { createLogViewerFactory, createSessionPickerFactory, parseJsonlFile, type SessionLogEntry } from "../tui/log-viewer";

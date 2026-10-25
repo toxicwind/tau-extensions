@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from "@tau/tau-agent";
+import type { ExtensionAPI } from "@tau/tau-agent-core";
 import { Input, matchesKey } from "@oh-my-pi/pi-tui";
 import type { OmniPI } from "./contracts.ts";
 import { createOmniExtension } from "./extension.ts";

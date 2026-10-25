@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionAPI, ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterState } from "../state";
 import { profileNames, ROUTER_PIN_VALUES } from "../config";
 import { handleStatus } from "./status";

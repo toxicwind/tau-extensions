@@ -7,7 +7,7 @@
 // - Epistemically calibrated via Kesselman (2008) National Intelligence Estimates
 // - Stylistic tell analysis informed by Massaro (2026, arXiv:2607.17228) and Oh et al. (2026)
 
-import type { ExtensionAPI } from "@tau/tau-agent";
+import type { ExtensionAPI } from "@tau/tau-agent-core";
 
 export const PROSE_GLOBS =
   /\.(md|mdx|markdown)$|\/(README|CHANGELOG|RELEASE|errors|runbooks)(\.[a-z]+)?\/?$/i;

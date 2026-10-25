@@ -12,7 +12,7 @@
 // still override it in source without touching call sites because tool_call
 // and tool_result both read the same source.
 
-import type { ExtensionAPI } from "@tau/tau-agent";
+import type { ExtensionAPI } from "@tau/tau-agent-core";
 
 // --- Path / glob filtering ---------------------------------------------------
 

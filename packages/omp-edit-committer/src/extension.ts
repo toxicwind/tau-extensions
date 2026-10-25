@@ -23,7 +23,7 @@
  * Any of those failing causes the extension to silently no-op — the agent
  * sees the normal Edit/Write result and the user is not interrupted.
  */
-import type {
+import type { 
 	EditToolCallEvent,
 	EditToolDetails,
 	EditToolResultEvent,
@@ -31,7 +31,7 @@ import type {
 	ExtensionContext,
 	WriteToolCallEvent,
 	WriteToolResultEvent,
-} from "@tau/tau-agent";
+} from "@tau/tau-agent-core";
 import {
 	type RepoProbe,
 	commitPaths,

@@ -1,9 +1,9 @@
-import type { ExtensionContext, Theme } from "@tau/tau-agent";
+import type { ExtensionContext, Theme } from "@tau/tau-agent-core";
 import type { TUI } from "@oh-my-pi/pi-tui";
 import type { ShimmerPalette } from "@tau/tau-agent/modes/theme/shimmer";
 import { shimmerSegments } from "@tau/tau-agent/modes/theme/shimmer";
 import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import type {
+import type { 
 	RoutingDecision,
 	RouterConfig,
 	RouterThinkingByProfile,

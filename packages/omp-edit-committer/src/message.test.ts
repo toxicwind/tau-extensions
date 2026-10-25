@@ -7,10 +7,10 @@
  * implicitly by the extension smoke test.
  */
 import { describe, expect, test } from "bun:test";
-import type {
+import type { 
 	EditToolDetails,
 	EditToolPerFileResult,
-} from "@tau/tau-agent";
+} from "@tau/tau-agent-core";
 import {
 	type DiffSummary,
 	buildMessage,

@@ -49,14 +49,14 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@tau/tau-agent": "*",
-    "@oh-my-pi/pi-tui": "*"
+    "@oh-my-pi/pi-tui": "*",
+    "@tau/tau-agent-core": "*"
   },
   "devDependencies": {
-    "@tau/tau-agent": "^18.0.0",
     "@oh-my-pi/pi-tui": "^18.0.0",
     "@types/node": "^25.9.5",
     "typescript": "^5.6.0",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "@tau/tau-agent-core": "^18.3.0"
   }
 }

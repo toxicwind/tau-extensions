@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { getAgentDir } from "@tau/tau-agent";
-import type {
+import { getAgentDir } from "@tau/tau-agent-core";
+import type { 
 	GlobalCalibrationSnapshot,
 	SessionCalibration,
 } from "./types";

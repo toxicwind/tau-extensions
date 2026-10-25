@@ -1,5 +1,5 @@
-import type { ExtensionContext } from "@tau/tau-agent";
-import { getAgentDir } from "@tau/tau-agent";
+import type { ExtensionContext } from "@tau/tau-agent-core";
+import { getAgentDir } from "@tau/tau-agent-core";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { RouterState } from "../state";

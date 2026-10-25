@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { getAgentDir } from "@tau/tau-agent";
-import type { ExtensionContext } from "@tau/tau-agent";
-import type {
+import { getAgentDir } from "@tau/tau-agent-core";
+import type { ExtensionContext } from "@tau/tau-agent-core";
+import type { 
 	RouterPersistedState,
 	CustomSessionEntry,
 	RoutingDecision,

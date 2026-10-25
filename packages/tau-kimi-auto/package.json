@@ -16,7 +16,7 @@
   "license": "MIT",
   "name": "@toxicwind/tau-kimi-auto",
   "peerDependencies": {
-    "@tau/tau-agent": "^18.0.11"
+    "@tau/tau-agent-core": "^18.3.0"
   },
   "repository": {
     "directory": "packages/tau-kimi-auto",

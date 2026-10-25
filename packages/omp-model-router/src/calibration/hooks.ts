@@ -3,7 +3,7 @@
  * Wired into OMP extension events: session_start, turn_start, turn_end, session_end
  */
 
-import type { ExtensionContext } from "@tau/tau-agent";
+import type { ExtensionContext } from "@tau/tau-agent-core";
 import type { RouterState } from "../state";
 import type { RouterConfig } from "../types";
 import {
