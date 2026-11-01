@@ -1,0 +1,18 @@
+{
+	"mcpServers": {
+		"DelendAI:toxicwind-tau-extensions": {
+			"type": "stdio",
+			"command": "bunx",
+			"args": [
+				"--package",
+				"@delendai/cli",
+				"delendai",
+				"__serve",
+				"--workspace",
+				".",
+				"--name",
+				"DelendAI:toxicwind-tau-extensions"
+			]
+		}
+	}
+}
